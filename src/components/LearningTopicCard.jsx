@@ -64,7 +64,7 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
       ) : (
         <>
           {topic.imageUrl && (
-            <img src={`http://localhost:5000${topic.imageUrl}`} alt={topic.name} className="w-full h-40 object-cover" />
+            <img src={`https://inpharm-admin-backend.onrender.com${topic.imageUrl}`} alt={topic.name} className="w-full h-40 object-cover" />
           )}
           <div className="p-4">
             <h3 className="text-lg font-semibold mb-2">{topic.name}</h3>
