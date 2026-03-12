@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* custom */
+body { @apply bg-gray-50 font-sans; }
+.header-brand { @apply text-white font-bold text-lg; }
+.card { @apply bg-white rounded-lg shadow p-4; }
