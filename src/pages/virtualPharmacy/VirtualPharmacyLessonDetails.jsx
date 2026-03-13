@@ -50,7 +50,7 @@ export default function VirtualPharmacyLessonDetails() {
   };
 
   const getVideoUrl = (url) => {
-    return url?.startsWith("http") ? url : https://inpharm-admin-backend.onrender.com${url}`;
+    return url?.startsWith("http") ? url : `https://inpharm-admin-backend.onrender.com${url}`;
   };
 
   const handleUpdateLesson = async () => {
