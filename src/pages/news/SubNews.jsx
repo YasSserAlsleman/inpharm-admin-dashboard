@@ -122,14 +122,14 @@ export default function SubNews() {
 )} 
               {item.image && (
                 <img
-                  src={`http://localhost:5000/uploads/subnews/${item.image}`}
+                  src={`https://inpharm-admin-backend.onrender.com/uploads/subnews/${item.image}`}
                   alt=""
                   className="mt-2 rounded"
                 />
               )}
               {item.audio && (
                 <audio controls className="mt-2 w-full">
-                  <source src={`http://localhost:5000/uploads/subnews/${item.audio}`} type="audio/mpeg" />
+                  <source src={`https://inpharm-admin-backend.onrender.com/uploads/subnews/${item.audio}`} type="audio/mpeg" />
                 </audio>
               )}
 
