@@ -174,7 +174,7 @@ function PeopleSection({ label, data, onAdd, onChange, onDelete, onFileChange })
         <div key={i} className="border p-3 mb-3 rounded relative bg-gray-50">
           {p.imageUrl && (
             <img
-              src={`http://localhost:5000${p.imageUrl}`}
+              src={`https://inpharm-admin-backend.onrender.com${p.imageUrl}`}
               alt="preview"
               className="w-20 h-20 object-cover rounded mb-2"
             />
