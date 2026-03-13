@@ -282,7 +282,7 @@ export default function LearningQuestionList() {
           {questions.map((q, idx) => (
             <div key={q._id} className="border p-3 rounded bg-gray-50">
               <h4 className="font-bold">{idx + 1}. {q.text}</h4>
-              {q.image && <img src={'https://inpharm-admin-backend.onrender.com/${q.image}`} alt="question" className="w-40 h-40 object-contain mt-1" />}
+              {q.image && <img src={`https://inpharm-admin-backend.onrender.com/${q.image}`} alt="question" className="w-40 h-40 object-contain mt-1" />}
                <ul className="list-disc ms-6 mt-2">
                 {q.options.map((opt, i) => (
                   <li key={i} className={opt.isCorrect ? "text-green-600 font-bold" : ""}>
