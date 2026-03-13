@@ -284,17 +284,17 @@ export default function VirtualPharmacyQuestionList() {
           {questions.map((q, idx) => (
             <div key={q._id} className="border p-3 rounded bg-gray-50">
               <h4 className="font-bold">{idx + 1}. {q.text}</h4>
-              {q.image && <img src={`http://localhost:5000/${q.image}`} alt="question" className="w-40 h-40 object-contain mt-1" />}
+              {q.image && <img src={`https://inpharm-admin-backend.onrender.com/${q.image}`} alt="question" className="w-40 h-40 object-contain mt-1" />}
                <ul className="list-disc ms-6 mt-2">
                 {q.options.map((opt, i) => (
                   <li key={i} className={opt.isCorrect ? "text-green-600 font-bold" : ""}>
                     {opt.text} {opt.isCorrect && "✅"}
-                    {opt.image && <img src={`http://localhost:5000/${opt.image}`} alt="option" className="w-20 h-20 object-contain inline-block ml-2" />} 
+                    {opt.image && <img src={`https://inpharm-admin-backend.onrender.com/${opt.image}`} alt="option" className="w-20 h-20 object-contain inline-block ml-2" />} 
                   </li>
                 ))}
                 
                 {q.noteText && <p className="mt-1 italic text-gray-700">💡 {q.noteText}</p>}
-              {q.noteImage && <img src={`http://localhost:5000/${q.noteImage}`} alt="note" className="w-40 h-40 object-contain mt-1" />}
+              {q.noteImage && <img src={`https://inpharm-admin-backend.onrender.com/${q.noteImage}`} alt="note" className="w-40 h-40 object-contain mt-1" />}
              
                 {q.sources?.length > 0 && (
                   <div className="mt-2">
