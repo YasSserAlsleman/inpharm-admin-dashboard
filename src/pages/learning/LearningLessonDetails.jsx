@@ -50,7 +50,7 @@ export default function LearningLessonDetails() {
   };
 
   const getVideoUrl = (url) => {
-    return url?.startsWith("http") ? url : `http://localhost:5000${url}`;
+    return url?.startsWith("http") ? url : `https://inpharm-admin-backend.onrender.com${url}`;
   };
 
   const handleUpdateLesson = async () => {
@@ -227,7 +227,7 @@ export default function LearningLessonDetails() {
                 <div className="mt-4">
                   <p className="font-semibold">📄 معاينة ملف PDF:</p>
                   <iframe
-                    src={`http://localhost:5000/uploads/pdfs/${lesson.pdfFile}`}
+                    src={`https://inpharm-admin-backend.onrender.com/uploads/pdfs/${lesson.pdfFile}`}
                     width="100%"
                     height="500px"
                     className="border mt-2"
