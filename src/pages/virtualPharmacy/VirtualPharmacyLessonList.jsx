@@ -19,8 +19,12 @@ export default function VirtualPharmacyLessonList() {
     name_ar: "",
     name_en: "",
     name_de: "",
-    videoFile: null,
-    pdfFile: null,
+    videoFile_ar: null,
+    videoFile_en: null,
+    videoFile_de: null,
+    pdfFileUpload_ar: null,
+    pdfFileUpload_en: null,
+    pdfFileUpload_de: null,
     description_ar: "",
     description_en: "",
     description_de: "",
@@ -119,7 +123,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
   const handleAddLesson = async () => {
     if (!newLesson.name_ar.trim() && !newLesson.name_en.trim() && !newLesson.name_de.trim())
       return alert(t('lessons.enterName'));
-    if (!newLesson.videoFile) return alert("الرجاء اختيار ملف فيديو!");
+    if (!newLesson.videoFile_ar && !newLesson.videoFile_en && !newLesson.videoFile_de) return alert("الرجاء اختيار ملف فيديو واحد على الأقل!");
 
     try {
       setAdding(true);
@@ -133,8 +137,12 @@ const handleToggleHide = async (lessonId, isHidden) => {
       formData.append("description_ar", newLesson.description_ar);
       formData.append("description_en", newLesson.description_en);
       formData.append("description_de", newLesson.description_de);
-      formData.append("video", newLesson.videoFile);
-      if (newLesson.pdfFile) formData.append("pdfFile", newLesson.pdfFile);
+      formData.append("video", newLesson.videoFile_ar);
+      if (newLesson.videoFile_en) formData.append("video_en", newLesson.videoFile_en);
+      if (newLesson.videoFile_de) formData.append("video_de", newLesson.videoFile_de);
+      if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);
+      if (newLesson.pdfFileUpload_en) formData.append("pdfFile_en", newLesson.pdfFileUpload_en);
+      if (newLesson.pdfFileUpload_de) formData.append("pdfFile_de", newLesson.pdfFileUpload_de);
 
       // إضافة المصادر
       newLesson.sources.forEach((source, index) => {
@@ -154,11 +162,15 @@ const handleToggleHide = async (lessonId, isHidden) => {
         name_ar: "",
         name_en: "",
         name_de: "",
-        pdfFile: null,
+        pdfFileUpload_ar: null,
+        pdfFileUpload_en: null,
+        pdfFileUpload_de: null,
         description_ar: "",
         description_en: "",
         description_de: "",
-        videoFile: null,
+        videoFile_ar: null,
+        videoFile_en: null,
+        videoFile_de: null,
         sources: [{ title: "", link: "" }],
       });
       fetchLectureAndLessons();
@@ -273,24 +285,68 @@ const handleToggleHide = async (lessonId, isHidden) => {
         />
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Video file</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Video file (العربية)</label>
           <input
             type="file"
             accept="video/*"
             className="border rounded p-2 w-full"
             onChange={(e) =>
-              setNewLesson({ ...newLesson, videoFile: e.target.files[0] })
+              setNewLesson({ ...newLesson, videoFile_ar: e.target.files[0] })
             }
           />
         </div>
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Video file (English)</label>
+          <input
+            type="file"
+            accept="video/*"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, videoFile_en: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Video file (Deutsch)</label>
+          <input
+            type="file"
+            accept="video/*"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, videoFile_de: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file (العربية)</label>
           <input
             type="file"
             accept="application/pdf"
             className="border rounded p-2 w-full"
             onChange={(e) =>
-              setNewLesson({ ...newLesson, pdfFile: e.target.files[0] })
+              setNewLesson({ ...newLesson, pdfFileUpload_ar: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file (English)</label>
+          <input
+            type="file"
+            accept="application/pdf"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, pdfFileUpload_en: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file (Deutsch)</label>
+          <input
+            type="file"
+            accept="application/pdf"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, pdfFileUpload_de: e.target.files[0] })
             }
           />
         </div>

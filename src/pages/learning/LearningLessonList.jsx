@@ -147,12 +147,6 @@ const handleToggleHide = async (lessonId, isHidden) => {
       if (newLesson.videoFile_de) formData.append("video_de", newLesson.videoFile_de);
       if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);
       if (newLesson.pdfFileUpload_en) formData.append("pdfFile_en", newLesson.pdfFileUpload_en);
-      formData.append("description_de", newLesson.description_de);
-      if (newLesson.videoFile_ar) formData.append("video_ar", newLesson.videoFile_ar);
-      if (newLesson.videoFile_en) formData.append("video_en", newLesson.videoFile_en);
-      if (newLesson.videoFile_de) formData.append("video_de", newLesson.videoFile_de);
-      if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);
-      if (newLesson.pdfFileUpload_en) formData.append("pdfFile_en", newLesson.pdfFileUpload_en);
       if (newLesson.pdfFileUpload_de) formData.append("pdfFile_de", newLesson.pdfFileUpload_de);
 
       // إضافة المصادر
@@ -162,7 +156,10 @@ const handleToggleHide = async (lessonId, isHidden) => {
           formData.append(`sources[${index}][link]`, source.link);
         }
       });
-      
+
+      const res = await axios.post('/learningLesson/add', formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       const { lessonId, status } = res.data;
 

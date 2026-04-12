@@ -10,16 +10,19 @@ export default function PodcastLessonList() {
   const { mainId } = useParams();
   const [lecture, setLecture] = useState(null);
   const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [adding, setAdding] = useState(false);
-  const { i18n, t } = useTranslation();
+
+  // دوال إدارة المصادر
 
   const [newLesson, setNewLesson] = useState({
     name_ar: "",
     name_en: "",
     name_de: "",
-    audioFile: null,
-    pdfFile: null,
+    audioFile_ar: null,
+    audioFile_en: null,
+    audioFile_de: null,
+    pdfFileUpload_ar: null,
+    pdfFileUpload_en: null,
+    pdfFileUpload_de: null,
     description_ar: "",
     description_en: "",
     description_de: "",
@@ -90,7 +93,7 @@ export default function PodcastLessonList() {
   // ➕ إضافة درس جديد
   const handleAddLesson = async () => {
     if (!newLesson.name_ar.trim() && !newLesson.name_en.trim() && !newLesson.name_de.trim()) return alert(t('lessons.enterName'));
-    if (!newLesson.audioFile) return alert("الرجاء اختيار ملف صوت!");
+    if (!newLesson.audioFile_ar && !newLesson.audioFile_en && !newLesson.audioFile_de) return alert("الرجاء اختيار ملف صوت واحد على الأقل!");
 
     try {
       setAdding(true);
@@ -105,8 +108,12 @@ export default function PodcastLessonList() {
       formData.append("description_ar", newLesson.description_ar);
       formData.append("description_en", newLesson.description_en);
       formData.append("description_de", newLesson.description_de);
-      formData.append("audio", newLesson.audioFile);   
-    if (newLesson.pdfFile) formData.append("pdfFile", newLesson.pdfFile);
+      if (newLesson.audioFile_ar) formData.append("audio_ar", newLesson.audioFile_ar);
+      if (newLesson.audioFile_en) formData.append("audio_en", newLesson.audioFile_en);
+      if (newLesson.audioFile_de) formData.append("audio_de", newLesson.audioFile_de);
+      if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);
+      if (newLesson.pdfFileUpload_en) formData.append("pdfFile_en", newLesson.pdfFileUpload_en);
+      if (newLesson.pdfFileUpload_de) formData.append("pdfFile_de", newLesson.pdfFileUpload_de);
 
       // إضافة المصادر
       newLesson.sources.forEach((source, index) => {
@@ -116,11 +123,13 @@ export default function PodcastLessonList() {
         }
       });
 
-      await axios.post("/podcastLesson/add", formData, {
+      const res = await axios.post("/podcastLesson/add", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setNewLesson({ name_ar: "", name_en: "", name_de: "", pdfFile: null, description_ar: "", description_en: "", description_de: "", audioFile: null, sources: [{ title: "", link: "" }] });
+      const { lessonId, status } = res.data;
+
+      setNewLesson({ name_ar: "", name_en: "", name_de: "", pdfFileUpload_ar: null, pdfFileUpload_en: null, pdfFileUpload_de: null, description_ar: "", description_en: "", description_de: "", audioFile_ar: null, audioFile_en: null, audioFile_de: null, sources: [{ title: "", link: "" }] });
       fetchLectureAndLessons();
 
       Swal.fire("✅ تم الحفظ!", "تمت إضافة الدرس بنجاح.", "success");
@@ -219,25 +228,68 @@ export default function PodcastLessonList() {
         />
 
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Audio file</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Audio file (العربية)</label>
           <input
             type="file"
             accept="audio/*"
             className="border rounded p-2 w-full"
             onChange={(e) =>
-              setNewLesson({ ...newLesson, audioFile: e.target.files[0] })
+              setNewLesson({ ...newLesson, audioFile_ar: e.target.files[0] })
             }
           />
         </div>
-
         <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Audio file (English)</label>
+          <input
+            type="file"
+            accept="audio/*"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, audioFile_en: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Audio file (Deutsch)</label>
+          <input
+            type="file"
+            accept="audio/*"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, audioFile_de: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file (العربية)</label>
           <input
             type="file"
             accept="application/pdf"
             className="border rounded p-2 w-full"
             onChange={(e) =>
-              setNewLesson({ ...newLesson, pdfFile: e.target.files[0] })
+              setNewLesson({ ...newLesson, pdfFileUpload_ar: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file (English)</label>
+          <input
+            type="file"
+            accept="application/pdf"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, pdfFileUpload_en: e.target.files[0] })
+            }
+          />
+        </div>
+        <div className="md:col-span-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1">PDF file (Deutsch)</label>
+          <input
+            type="file"
+            accept="application/pdf"
+            className="border rounded p-2 w-full"
+            onChange={(e) =>
+              setNewLesson({ ...newLesson, pdfFileUpload_de: e.target.files[0] })
             }
           />
         </div>
