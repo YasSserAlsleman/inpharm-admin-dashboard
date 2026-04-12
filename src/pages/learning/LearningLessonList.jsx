@@ -5,6 +5,7 @@ import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import i18n from "../../i18n";
 
 export default function LearningLessonList() {
   const { lectureId } = useParams();
@@ -15,7 +16,7 @@ export default function LearningLessonList() {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
 
   const [newLesson, setNewLesson] = useState({
     name_ar: "",

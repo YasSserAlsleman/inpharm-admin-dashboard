@@ -5,6 +5,7 @@ import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
+import i18n from "../../i18n";
 
 export default function PodcastLessonList() {
   const { mainId } = useParams();
