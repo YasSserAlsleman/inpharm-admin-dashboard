@@ -13,6 +13,8 @@ export default function PodcastLessonList() {
 
   // دوال إدارة المصادر
 
+const[loading, setLoading] = useState(true);
+
   const [newLesson, setNewLesson] = useState({
     name_ar: "",
     name_en: "",

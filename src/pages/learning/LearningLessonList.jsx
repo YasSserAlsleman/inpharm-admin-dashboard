@@ -126,7 +126,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
   // إضافة درس جديد
   const handleAddLesson = async () => {
     if (!newLesson.name_ar.trim() && !newLesson.name_en.trim() && !newLesson.name_de.trim()) return alert(t('lessons.enterName', "أدخل اسم الدرس على الأقل بلغة واحدة!"));
-    if (!newLesson.videoFile_ar && !newLesson.videoFile_en && !newLesson.videoFile_de) return alert("الرجاء اختيار ملف فيديو واحد على الأقل!");
+    if (!newLesson.videoFile_ar && !newLesson.videoFile_en && !newLesson.videoFile_de && !newLesson.pdfFileUpload_ar && !newLesson.pdfFileUpload_en && !newLesson.pdfFileUpload_de) return alert("الرجاء اختيار ملف فيديو أو PDF واحد على الأقل!");
      
     try {
       setAdding(true);
@@ -409,6 +409,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
                 <th className="p-2">{t('lessons.description')}</th>
                 <th className="p-2">{t('lessons.status')}</th>
                 <th className="p-2 text-center">{t('lessons.actions')}</th>
+                <th className="p-2 text-center">إخفاء</th>
               </tr>
             </thead>
             <tbody>
@@ -463,17 +464,14 @@ const handleToggleHide = async (lessonId, isHidden) => {
                       >
                         🗑
                       </button>
-                      
-      {/* إضافة Toggle */}
-      <div className="mt-4">
-        <label>إخفاء من التطبيق الجوال</label>
-        <input
-          type="checkbox"
-          checked={lesson.isHidden}
-          onChange={(e) => handleToggleHide(lesson._id, e.target.checked)}
-        />
-      </div>
                     </div>
+                  </td>
+                  <td className="p-2 text-center">
+                    <input
+                      type="checkbox"
+                      checked={lesson.isHidden}
+                      onChange={(e) => handleToggleHide(lesson._id, e.target.checked)}
+                    />
                   </td>
                 </tr>
               ))}
