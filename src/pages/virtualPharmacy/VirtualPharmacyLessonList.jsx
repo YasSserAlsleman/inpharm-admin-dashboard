@@ -137,7 +137,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
       formData.append("description_ar", newLesson.description_ar);
       formData.append("description_en", newLesson.description_en);
       formData.append("description_de", newLesson.description_de);
-      formData.append("video", newLesson.videoFile_ar);
+      formData.append("video_ar", newLesson.videoFile_ar);
       if (newLesson.videoFile_en) formData.append("video_en", newLesson.videoFile_en);
       if (newLesson.videoFile_de) formData.append("video_de", newLesson.videoFile_de);
       if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);
