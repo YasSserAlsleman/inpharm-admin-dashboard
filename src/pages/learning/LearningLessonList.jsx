@@ -9,8 +9,9 @@ import i18n from "../../i18n";
 
 export default function LearningLessonList() {
   const { lectureId } = useParams();
+    const { mainId, researchId } = location.state || {};
+
   const location = useLocation();
-  const { mainId, researchId } = location.state || {};
 
   const [lecture, setLecture] = useState(null);
   const [lessons, setLessons] = useState([]);
