@@ -97,7 +97,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
   const pollLessonStatus = (lessonId) => {
     const interval = setInterval(async () => {
       try {
-        const res = await axios.post(`/VirtualPharmacyLesson/admin/${lessonId}`);
+        const res = await axios.get(`/VirtualPharmacyLesson/admin/${lessonId}`);
         const data = res.data;
         setLessonProgress((prev) => ({
           ...prev,
@@ -125,7 +125,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
       return alert(t('lessons.enterName'));
     if (!newLesson.videoFile_ar && !newLesson.videoFile_en && !newLesson.videoFile_de) return alert("الرجاء اختيار ملف فيديو واحد على الأقل!");
 
-    try {
+    try { 
       setAdding(true);
       const formData = new FormData();
       formData.append("name", newLesson.name_ar || newLesson.name_en || newLesson.name_de);
