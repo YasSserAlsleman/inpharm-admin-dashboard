@@ -152,9 +152,8 @@ const handleToggleHide = async (lessonId, isHidden) => {
         }
       });
 
-      const res = await axios.post("/VirtualPharmacyLesson/add", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axios.post("/VirtualPharmacyLesson/add", formData
+       );
 
       const { lessonId, status } = res.data;
 

@@ -5,7 +5,7 @@ import { BASE_API_URL } from '../config/config';  // أضف هذا في الأع
  
 const axiosClient = axios.create({
   baseURL: BASE_API_URL,
-  headers: { 'Content-Type': 'application/json' },
+    withCredentials: true, // ✅ مهم
 })
 
 axiosClient.interceptors.request.use(config => {
