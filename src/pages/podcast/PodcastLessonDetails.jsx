@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import { BASE_FILE_URL } from '../../config/config';
 
 export default function PodcastLessonDetails() {
-    const { i18n } = useTranslation();
+    const { t,i18n } = useTranslation();
     const { lessonId } = useParams();
     const [lesson, setLesson] = useState(null);
     const [activeTab, setActiveTab] = useState("audio");

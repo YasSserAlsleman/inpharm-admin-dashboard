@@ -6,7 +6,8 @@ import { useParams } from "react-router-dom";
 import { BASE_FILE_URL } from '../../config/config';
 
 export default function VirtualPharmacyLessonDetails() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+
   const { lessonId } = useParams();
   const [lesson, setLesson] = useState(null);
   const [activeTab, setActiveTab] = useState("video");
@@ -46,7 +47,7 @@ export default function VirtualPharmacyLessonDetails() {
 
   const fetchLesson = async () => {
     try {
-      const res = await axios.post(`/VirtualPharmacyLesson/admin/${lessonId}`);
+      const res = await axios.get(`/VirtualPharmacyLesson/admin/${lessonId}`);
       setLesson(res.data);
       setEditedLesson({
         name: res.data.name || "",

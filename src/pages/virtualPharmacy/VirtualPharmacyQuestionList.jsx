@@ -1,19 +1,17 @@
-
-
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "../../api/axiosClient";
-import { BASE_FILE_URL } from '../../config/config';
+import { BASE_FILE_URL } from '../../config/config';  // أضف هذا في الأعلى
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../../utils/getLocalizedValue';
 
-export default function VirtualPharmacyQuestionList() {
+export default function LearningQuestionList() {
   const { lessonId } = useParams();
   const [lesson, setLesson] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { i18n, t } = useTranslation();
-
+  const { i18n } = useTranslation();
+ 
   // نص السؤال + صورة السؤال
   const [newQuestionText, setNewQuestionText] = useState("");
   const [newQuestionTextAr, setNewQuestionTextAr] = useState("");
@@ -50,7 +48,7 @@ export default function VirtualPharmacyQuestionList() {
     try {
       setLoading(true);
       const [lessonRes, questionRes] = await Promise.all([
-        axios.post(`/VirtualPharmacyLesson/admin/${lessonId}`),
+            axios.get(`/VirtualPharmacyLesson/admin/${lessonId}`),
         axios.get(`/question/byLesson/${lessonId}`)
       ]);
       setLesson(lessonRes.data);
@@ -114,18 +112,20 @@ export default function VirtualPharmacyQuestionList() {
   const handleAddQuestion = async () => {
     if (!newQuestionTextEn.trim()) return alert("أدخل نص السؤال بالإنجليزية على الأقل!");
     if (options.length === 0) return alert("أضف على الأقل خياراً واحداً!");
-
     try {
       const formData = new FormData();
       formData.append("lessonId", lessonId);
+      formData.append("text", newQuestionText || newQuestionTextEn || newQuestionTextAr || newQuestionTextDe);
+     
       formData.append("text_ar", newQuestionTextAr);
       formData.append("text_en", newQuestionTextEn);
       formData.append("text_de", newQuestionTextDe);
       formData.append("isMultipleCorrect", isMultipleCorrect);
       if (questionImage) formData.append("questionImage", questionImage);
-      formData.append("note_ar", noteTextAr);
-      formData.append("note_en", noteTextEn);
-      formData.append("note_de", noteTextDe);
+      formData.append("noteText", noteText);
+      formData.append("noteText_ar", noteTextAr);
+      formData.append("noteText_en", noteTextEn);
+      formData.append("noteText_de", noteTextDe);
       if (noteImage) formData.append("noteImage", noteImage);
 
       formData.append("sources", JSON.stringify(sources.filter((s) => s.trim() !== "")));
@@ -138,7 +138,6 @@ export default function VirtualPharmacyQuestionList() {
         isCorrect: opt.isCorrect 
       }));
       formData.append("options", JSON.stringify(formattedOptions));
-
       // صور الخيارات منفصلة
       options.forEach((opt) => {
         if (opt.image) formData.append("optionImages", opt.image);
@@ -242,44 +241,92 @@ export default function VirtualPharmacyQuestionList() {
 
         <h4 className="font-semibold">خيارات الإجابة:</h4>
         {options.map((opt, index) => (
-          <div key={index} className="flex gap-2 items-center mb-1">
-            <input
-              type="text"
-              placeholder={`الخيار ${index + 1}`}
-              className="flex-1 border rounded p-2"
-              value={opt.text}
-              onChange={(e) => handleOptionChange(index, "text", e.target.value)}
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => handleOptionImageChange(index, e.target.files[0])}
-            />
-            {opt.preview && <img src={opt.preview} alt="option preview" className="w-20 h-20 object-contain border" />}
-            <label className="flex items-center gap-1">
-              {isMultipleCorrect ? (
-                <input type="checkbox" checked={opt.isCorrect} onChange={(e) => handleCorrectChange(index, e.target.checked)} />
-              ) : (
-                <input type="radio" name="singleCorrect" checked={opt.isCorrect} onChange={() => handleCorrectChange(index, true)} />
-              )}
-              صحيح
-            </label>
-            <button className="bg-red-500 text-white px-2 py-1 rounded" onClick={() => handleRemoveOption(index)}>{t('lessons.removeOption')}</button>
+          <div key={index} className="mb-4 p-2 border rounded">
+            <div className="grid grid-cols-1 gap-2 mb-2">
+              <div>
+                <label className="block text-sm font-medium">Option Text (Arabic)</label>
+                <input
+                  type="text"
+                  placeholder={`الخيار ${index + 1} بالعربية`}
+                  className="w-full border rounded p-2"
+                  value={opt.text_ar}
+                  onChange={(e) => handleOptionChange(index, "text_ar", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Option Text (English)</label>
+                <input
+                  type="text"
+                  placeholder={`Option ${index + 1} in English`}
+                  className="w-full border rounded p-2"
+                  value={opt.text_en}
+                  onChange={(e) => handleOptionChange(index, "text_en", e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium">Option Text (German)</label>
+                <input
+                  type="text"
+                  placeholder={`Option ${index + 1} auf Deutsch`}
+                  className="w-full border rounded p-2"
+                  value={opt.text_de}
+                  onChange={(e) => handleOptionChange(index, "text_de", e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 items-center">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleOptionImageChange(index, e.target.files[0])}
+              />
+              {opt.preview && <img src={opt.preview} alt="option preview" className="w-20 h-20 object-contain border" />}
+              <label className="flex items-center gap-1">
+                {isMultipleCorrect ? (
+                  <input type="checkbox" checked={opt.isCorrect} onChange={(e) => handleCorrectChange(index, e.target.checked)} />
+                ) : (
+                  <input type="radio" name="singleCorrect" checked={opt.isCorrect} onChange={() => handleCorrectChange(index, true)} />
+                )}
+                صحيح
+              </label>
+              <button className="bg-red-500 text-white px-2 py-1 rounded" onClick={() => handleRemoveOption(index)}>✖</button>
+            </div>
           </div>
         ))}
 
         <div className="flex gap-2 mt-2">
-          <button className="bg-gray-400 text-white px-3 py-1 rounded" onClick={handleAddOption}>{t('lessons.addNewOption')}</button>
+          <button className="bg-gray-400 text-white px-3 py-1 rounded" onClick={handleAddOption}>+ خيار جديد</button>
         </div>
 
         <div className="mt-3">
           <h4 className="font-semibold">ملاحظة السؤال (اختياري):</h4>
-          <textarea
-            placeholder="ملاحظة نصية"
-            className="w-full border rounded p-2 mb-2"
-            value={noteText}
-            onChange={(e) => setNoteText(e.target.value)}
-          />
+          <div>
+            <label className="block text-sm font-medium mb-1">Note (Arabic)</label>
+            <textarea
+              placeholder="ملاحظة نصية بالعربية"
+              className="w-full border rounded p-2 mb-2"
+              value={noteTextAr}
+              onChange={(e) => setNoteTextAr(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Note (English)</label>
+            <textarea
+              placeholder="Note in English"
+              className="w-full border rounded p-2 mb-2"
+              value={noteTextEn}
+              onChange={(e) => setNoteTextEn(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Note (German)</label>
+            <textarea
+              placeholder="Notiz auf Deutsch"
+              className="w-full border rounded p-2 mb-2"
+              value={noteTextDe}
+              onChange={(e) => setNoteTextDe(e.target.value)}
+            />
+          </div>
           <input
             type="file"
             accept="image/*"
@@ -319,7 +366,7 @@ export default function VirtualPharmacyQuestionList() {
 
 
  <div className="flex gap-2 mt-2">
-          <button className="bg-primary text-white px-4 py-2 rounded" onClick={handleAddQuestion}>✅ {t('lessons.addQuestion')}</button>
+          <button className="bg-primary text-white px-4 py-2 rounded" onClick={handleAddQuestion}>✅ إضافة السؤال</button>
         </div>
 
       </div>
@@ -363,7 +410,7 @@ export default function VirtualPharmacyQuestionList() {
 
 
               </ul>
-              <button onClick={() => handleDeleteQuestion(q._id)} className="bg-red-500 text-white px-3 py-1 rounded mt-2">{t('lessons.deleteQuestion')}</button>
+              <button onClick={() => handleDeleteQuestion(q._id)} className="bg-red-500 text-white px-3 py-1 rounded mt-2">حذف</button>
             </div>
           ))}
         </div>
