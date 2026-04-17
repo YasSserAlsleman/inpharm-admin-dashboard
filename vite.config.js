@@ -10,6 +10,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false, // Disable sourcemaps for production
-    minify: 'terser'
+    minify: 'esbuild' // Use esbuild for faster minification
   }
 })
