@@ -5,64 +5,127 @@ import {
   TextField,
   Button,
   Box,
-  MenuItem
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Select,
+  Chip
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "../../api/axiosClient";
+import Alert from "@mui/material/Alert";
 
 const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
 
   const [quantity, setQuantity] = useState(1);
   const [planId, setPlanId] = useState("");
   const [accessType, setAccessType] = useState("");
+  const [targetIds, setTargetIds] = useState([]);
+  const [availableTargets, setAvailableTargets] = useState([]);
 
   const [plans, setPlans] = useState([]);
   const [downloadAfterGenerate, setDownloadAfterGenerate] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   // جلب الخطط من السيرفر
   useEffect(() => {
     const fetchPlans = async () => {
       try {
-        const res = await axios.get("/plans"); // API يعيد جميع الخطط
+        const res = await axios.get("/plans");
         setPlans(res.data);
+        setError("");
       } catch (err) {
         console.error(err);
+        setError("Failed to load plans");
       }
     };
-    fetchPlans();
-  }, []);
+    if (open) fetchPlans();
+  }, [open]);
+
+  // جلب الأهداف المتاحة بناءً على accessType
+  useEffect(() => {
+    const fetchTargets = async () => {
+      if (!accessType) return;
+      try {
+        let endpoint = "";
+        if (accessType === "section") endpoint = "/sections";
+        else if (accessType === "topic") endpoint = "/topics";
+        else if (accessType === "research") endpoint = "/learningResearch/all";
+        else if (accessType === "lecture") endpoint = "/lecture/all";
+        if (endpoint) {
+          const res = await axios.get(endpoint);
+          setAvailableTargets(res.data);
+        } else {
+          setAvailableTargets([]);
+        }
+      } catch (err) {
+        console.error(err);
+        setAvailableTargets([]);
+      }
+    };
+    fetchTargets();
+  }, [accessType]);
 
   const generateCodes = async (download = false) => {
+    setError("");
+
+    // Validation
+    if (!quantity || quantity < 1) {
+      setError("Quantity must be at least 1");
+      return;
+    }
+    if (!planId) {
+      setError("Please select a plan");
+      return;
+    }
+    if (accessType && accessType !== "app" && targetIds.length === 0) {
+      setError(`Please select at least one ${accessType}`);
+      return;
+    }
+
+    setLoading(true);
 
     try {
-
-      const res = await axios.post("/codes/generate", {
+      const payload = {
         accessType,
         quantity,
         planId,
-       });
+        targetIds: accessType !== "app" ? targetIds.map(id => ({
+          resourceType: accessType,
+          resourceId: id
+        })) : [],
+        expiresIn: 365
+      };
 
+      const res = await axios.post("/codes/generate", payload);
       const newCodes = res.data.codes;
 
       if (download) {
-
         const plan = plans.find(p => p._id === planId);
-
         exportNewCodes(
           newCodes,
           plan?.accessType || "plan",
           plan?.durationDays || "duration"
         );
-
       }
 
+      // Reset form
+      setQuantity(1);
+      setPlanId("");
+      setAccessType("");
+      setTargetIds([]);
+      setError("");
+
+      onGenerated?.();
       handleClose();
-
     } catch (err) {
-
+      const errorMessage = err.response?.data?.message || err.message || "Failed to generate codes";
+      setError(errorMessage);
       console.error(err);
-
+    } finally {
+      setLoading(false);
     }
-
   };
 
   const exportNewCodes = (codes, accessType, durationDays) => {
@@ -105,18 +168,19 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
 
   };
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Generate Codes</DialogTitle>
       <DialogContent>
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2, marginTop: 2 }}>
-
-
+          {error && <Alert severity="error">{error}</Alert>}
 
           <TextField
             label="Quantity"
             type="number"
             value={quantity}
             onChange={(e) => setQuantity(Number(e.target.value))}
+            inputProps={{ min: 1 }}
+            disabled={loading}
           />
 
           <TextField
@@ -125,10 +189,11 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
             value={planId}
             onChange={(e) => {
               setPlanId(e.target.value);
-              const p =plans.find(p => p._id === e.target.value);
-              setAccessType(p.accessType);
-
+              const p = plans.find(p => p._id === e.target.value);
+              setAccessType(p?.accessType || "");
+              setTargetIds([]);
             }}
+            disabled={loading}
           >
             {plans.map(plan => (
               <MenuItem key={plan._id} value={plan._id}>
@@ -137,30 +202,59 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
             ))}
           </TextField>
 
+          {accessType && accessType !== "app" && (
+            <FormControl fullWidth disabled={loading}>
+              <InputLabel>Select Targets</InputLabel>
+              <Select
+                multiple
+                value={targetIds}
+                onChange={(e) => setTargetIds(typeof e.target.value === 'string' ? e.target.value.split(',') : e.target.value)}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip key={value} label={availableTargets.find(t => t._id === value)?.name || value} />
+                    ))}
+                  </Box>
+                )}
+              >
+                {availableTargets.length === 0 ? (
+                  <MenuItem disabled>No {accessType} found</MenuItem>
+                ) : (
+                  availableTargets.map(target => (
+                    <MenuItem key={target._id} value={target._id}>
+                      {target.name || target.title || target._id}
+                    </MenuItem>
+                  ))
+                )}
+              </Select>
+            </FormControl>
+          )}
 
 
-          <Box sx={{ display: "flex", gap: 2 }}>
 
+          <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
+            <Button
+              onClick={handleClose}
+              disabled={loading}
+            >
+              Cancel
+            </Button>
             <Button
               variant="contained"
               color="secondary"
-              onClick={() => {
-                generateCodes(false);
-              }}
+              onClick={() => generateCodes(false)}
+              disabled={loading}
             >
-              Generate Only
+              {loading ? "Generating..." : "Generate Only"}
             </Button>
-
             <Button
               variant="contained"
               color="success"
-              onClick={() => {
-                generateCodes(true);
-              }}
+              onClick={() => generateCodes(true)}
+              disabled={loading}
             >
-              Generate + Download
+              {loading ? "Generating..." : "Generate + Download"}
             </Button>
-
           </Box>
 
         </Box>

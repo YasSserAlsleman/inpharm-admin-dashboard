@@ -18,7 +18,11 @@ export default function Login() {
       await login(email, password);
       navigate('/'); 
     } catch (err) {
-      alert(err.message || t('login.failed'));
+      if (err.message.includes('جهاز آخر')) {
+        alert(t('login.deviceMismatch'));
+      } else {
+        alert(err.message || t('login.failed'));
+      }
     } finally {
       setLoading(false);
     }

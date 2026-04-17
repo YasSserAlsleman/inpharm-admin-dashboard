@@ -4,10 +4,10 @@ import { useTranslation } from 'react-i18next'
 import { getLocalizedValue } from '../../utils/getLocalizedValue'
 import { BASE_FILE_URL } from '../../config/config'
 import { useParams, useNavigate, Link } from "react-router-dom";
- 
+
 export default function SubNews() {
   const { newsId } = useParams(); // القسم الذي نعرض أخباره
-    const [news, setMainNews] = useState(null);
+  const [news, setMainNews] = useState(null);
 
   const [subNews, setSubNews] = useState([]);
   const [titleEn, setTitleEn] = useState("");
@@ -27,9 +27,9 @@ export default function SubNews() {
       const [mainNews, subNews] = await Promise.all([
         axios.get(`/news/${newsId}`),
         axios.get(`/subNews/${newsId}`)
-      ]);   
-         setSubNews(subNews.data);
-         setMainNews(mainNews.data);
+      ]);
+      setSubNews(subNews.data);
+      setMainNews(mainNews.data);
     } catch (err) {
       console.error("❌ Error loading subnews:", err);
     }
@@ -76,9 +76,9 @@ export default function SubNews() {
     }
   };
 
-const getAudioUrl = (url) => {
-         return url?.startsWith("http") ? url : `${BASE_FILE_URL}/uploads/subnews/${url}`;
-    };
+  const getAudioUrl = (url) => {
+    return url?.startsWith("http") ? url : `${BASE_FILE_URL}/uploads/subnews/${url}`;
+  };
 
 
   const handleDelete = async (id) => {
@@ -91,11 +91,22 @@ const getAudioUrl = (url) => {
     }
   };
 
+
+// 🔒 تحديث حالة الإخفاء لمحور
+const handleToggleHide = async (subNewsId, isHidden) => {
+  try {
+    await axios.put(`/subnews/${subNewsId}/hide`, { isHidden });
+    fetchSubNews();  // إعادة جلب البيانات لتحديث العرض
+  } catch (err) {
+    console.error("❌ Error toggling hide:", err);
+  }
+};
+
   return (
     <div className="p-6">
-<h2 className="text-2xl font-bold mb-6 text-gray-800">
-  {news ? getLocalizedValue(news, 'name', i18n.language) : "جاري تحميل القسم..."}
-</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">
+        {news ? getLocalizedValue(news, 'name', i18n.language) : "جاري تحميل القسم..."}
+      </h2>
       <div className="bg-white p-6 rounded-lg shadow-md mb-6 max-w-lg mx-auto flex flex-col gap-4">
         <div>
           <label className="block text-sm font-medium mb-1">Title (English)</label>
@@ -165,7 +176,7 @@ const getAudioUrl = (url) => {
           <input type="file" accept="audio/*" onChange={(e) => setAudio(e.target.files[0])} />
         </div>
 
-<div>
+        <div>
           <label className="block text-sm mb-1">🎙️ الصوت  بالانكليزي(اختياري)</label>
           <input type="file" accept="audio/*" onChange={(e) => setAudioEn(e.target.files[0])} />
         </div>
@@ -187,20 +198,20 @@ const getAudioUrl = (url) => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {subNews.map((item) => (
 
-        
+
             <div key={item._id} className="bg-white p-4 rounded-lg shadow">
               <h3 className="font-semibold text-lg">
                 {getLocalizedValue(item, 'title', i18n.language)}</h3>
 
-{getLocalizedValue(item, 'description', i18n.language) ? (
-  <p className="text-gray-600 text-sm mb-3">
-    {getLocalizedValue(item, 'description', i18n.language).length > 100
-      ? getLocalizedValue(item, 'description', i18n.language).slice(0, 100) + "…"
-      : getLocalizedValue(item, 'description', i18n.language)}
-  </p>
-) : (
-  <p className="text-gray-400 text-sm mb-3">لا يوجد وصف متاح</p>
-)} 
+              {getLocalizedValue(item, 'description', i18n.language) ? (
+                <p className="text-gray-600 text-sm mb-3">
+                  {getLocalizedValue(item, 'description', i18n.language).length > 100
+                    ? getLocalizedValue(item, 'description', i18n.language).slice(0, 100) + "…"
+                    : getLocalizedValue(item, 'description', i18n.language)}
+                </p>
+              ) : (
+                <p className="text-gray-400 text-sm mb-3">لا يوجد وصف متاح</p>
+              )}
               {item.image && (
                 <img
                   src={`${BASE_FILE_URL}/uploads/subnews/${item.image}`}
@@ -209,10 +220,10 @@ const getAudioUrl = (url) => {
                 />
               )}
               {(item.audio || item.audio_en || item.audio_de) && (
-           <audio controls className="mb-3 w-full">
-                                    <source src={getAudioUrl(getLocalizedValue(item, 'audio', i18n.language))} />
-                                    المتصفح لا يدعم تشغيل الصوت.
-                                </audio>
+                <audio controls className="mb-3 w-full">
+                  <source src={getAudioUrl(getLocalizedValue(item, 'audio', i18n.language))} />
+                  المتصفح لا يدعم تشغيل الصوت.
+                </audio>
 
 
                 // <audio controls className="mt-2 w-full">
@@ -226,11 +237,38 @@ const getAudioUrl = (url) => {
               >
                 🗑 حذف
               </button>
+
+
+
+
+            {/* 🔹 إضافة Toggle للإخفاء */}
+            <div className="mt-4 flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-700">إخفاء من التطبيق الجوال</label>
+              <input
+                type="checkbox"
+                checked={item.isHidden || false}
+                onChange={(e) => handleToggleHide(item._id, e.target.checked)}
+                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+              />
             </div>
+
+            {/* إشارة بصرية لحالة الإخفاء */}
+            {item.isHidden && (
+              <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                مخفي
+              </div>
+            )}
+
+       
+              
+            </div>
+
+
+
           ))}
         </div>
       )}
-  {/* 🔙 رجوع */}
+      {/* 🔙 رجوع */}
       <div className="mt-6">
         <Link to="/news" className="text-blue-600 hover:underline">
           ← العودة إلى  الأخبار والتنبيهات

@@ -16,6 +16,9 @@ export default function LearningLectureList() {
   const [newLectureNameAr, setNewLectureNameAr] = useState("");
   const [newLectureNameEn, setNewLectureNameEn] = useState("");
   const [newLectureNameDe, setNewLectureNameDe] = useState("");
+  const [newLectureImage, setNewLectureImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -49,23 +52,44 @@ const handleToggleHide = async (lectureId, isHidden) => {
   }
 };
 
+
+  // 👆 تحويل الصورة إلى base64 للعرض قبل الإضافة
+  const handleImageChange = (file, setPreview, setFile) => {
+    if (!file) return;
+    setFile(file);
+
+    const reader = new FileReader();
+    reader.onload = (event) => setPreview(event.target.result);
+    reader.readAsDataURL(file);
+  };
+
+
   // ➕ إضافة محاضرة جديدة
   const handleAddLecture = async () => {
-    if (!newLectureNameEn.trim()) return alert("أدخل اسم المحاضرة بالإنجليزية على الأقل!");
+    if (!newLectureNameEn.trim())
+       return alert("أدخل اسم المحاضرة بالإنجليزية على الأقل!");
     try {
-      await axios.post(`/lecture`, { 
-        name: newLectureNameAr, 
-        name_en: newLectureNameEn, 
-        name_de: newLectureNameDe, 
-        researchId 
+            const formData = new FormData();
+      formData.append("name", newLectureNameAr || newLectureNameEn || newLectureNameDe);
+      formData.append("name_ar", newLectureNameAr);
+      formData.append("name_en", newLectureNameEn);
+      formData.append("name_de", newLectureNameDe);
+      formData.append("researchId", researchId);
+      if (newLectureImage) formData.append("image", newLectureImage);
+
+      await axios.post(`/lecture`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
       setNewLectureNameAr("");
       setNewLectureNameEn("");
       setNewLectureNameDe("");
+      setNewLectureImage(null);
+      setPreviewImage(null);
       fetchResearchAndLectures();
     } catch (err) {
       console.error("❌ خطأ أثناء إضافة المحاضرة:", err);
-    }
+    }  
+      
   };
 
   // 🗑 حذف محاضرة
@@ -119,6 +143,26 @@ const handleToggleHide = async (lectureId, isHidden) => {
             onChange={(e) => setNewLectureNameDe(e.target.value)}
           />
         </div>
+
+{/* صورة المحور */}
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) =>
+      handleImageChange(e.target.files[0], setPreviewImage, setNewLectureImage)
+    }
+    className="border border-gray-300 rounded px-3 py-2"
+  />
+
+  {/* معاينة الصورة */}
+  {previewImage && (
+    <img
+      src={previewImage}
+      alt="Preview"
+      className="w-full h-40 object-cover rounded border"
+    />
+  )}
+
         <button
           className="bg-primary text-white px-4 py-2 rounded"
           onClick={handleAddLecture}

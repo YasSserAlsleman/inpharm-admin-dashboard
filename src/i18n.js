@@ -35,7 +35,8 @@ const resources = {
         email: 'Email',
         password: 'Password',
         signing: 'Signing...',
-        failed: 'Login failed'
+        failed: 'Login failed',
+        deviceMismatch: 'Login from another device. Only one device login is allowed.'
       },
       lessons: {
         addLesson: 'Add Lesson',
@@ -143,7 +144,8 @@ const resources = {
         email: 'البريد الإلكتروني',
         password: 'كلمة المرور',
         signing: 'جاري الدخول...',
-        failed: 'فشل تسجيل الدخول'
+        failed: 'فشل تسجيل الدخول',
+        deviceMismatch: 'تم تسجيل الدخول من جهاز آخر. يُسمح بتسجيل الدخول من جهاز واحد فقط.'
       },
       lessons: {
         addLesson: 'إضافة درس',
@@ -250,7 +252,8 @@ const resources = {
         email: 'E-Mail',
         password: 'Passwort',
         signing: 'Anmeldung...',
-        failed: 'Anmeldung fehlgeschlagen'
+        failed: 'Anmeldung fehlgeschlagen',
+        deviceMismatch: 'Anmeldung von einem anderen Gerät. Nur eine Geräteanmeldung ist erlaubt.'
       },
       lessons: {
         addLesson: 'Lektion hinzufügen',

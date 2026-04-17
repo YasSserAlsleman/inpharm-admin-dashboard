@@ -74,6 +74,17 @@ export default function News() {
         }
     };
 
+
+// 🔒 تحديث حالة الإخفاء لمحور
+const handleToggleHide = async (newsId, isHidden) => {
+  try {
+    await axios.put(`/news/${newsId}/hide`, { isHidden });
+    fetchNews();  // إعادة جلب البيانات لتحديث العرض
+  } catch (err) {
+    console.error("❌ Error toggling hide:", err);
+  }
+};
+
     return (
         <div className="p-6">
             <h2 className="text-2xl font-bold mb-6 text-gray-800"> الأخبار والتنبيهات</h2>
@@ -186,7 +197,32 @@ export default function News() {
                                     🗑 حذف
                                 </button>
                             </div>
-                        </div>
+
+
+
+
+            {/* 🔹 إضافة Toggle للإخفاء */}
+            <div className="mt-4 flex items-center justify-between">
+              <label className="text-sm font-medium text-gray-700">إخفاء من التطبيق الجوال</label>
+              <input
+                type="checkbox"
+                checked={item.isHidden || false}
+                onChange={(e) => handleToggleHide(item._id, e.target.checked)}
+                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
+              />
+            </div>
+
+            {/* إشارة بصرية لحالة الإخفاء */}
+            {item.isHidden && (
+              <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
+                مخفي
+              </div>
+            )}
+
+       </div>
+
+
+
                     ))}
                 </div>
 
