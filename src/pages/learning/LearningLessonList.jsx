@@ -103,7 +103,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
     const interval = setInterval(async () => {
       try {
 
-        const res = await axios.post(`/learningLesson/admin/${lessonId}`);
+        const res = await axios.get(`/learningLesson/admin/${lessonId}`);
         const data = res.data;
         setLessonProgress((prev) => ({
           ...prev,
