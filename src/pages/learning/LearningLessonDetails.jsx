@@ -73,7 +73,7 @@ export default function LearningLessonDetails() {
 
   const fetchLesson = async () => {
     try {
-      const res = await axios.post(`/learningLesson/admin/${lessonId}`);
+      const res = await axios.get(`/learningLesson/admin/${lessonId}`);
       setLesson(res.data);
       setEditedLesson({
         name: res.data.name || "",
