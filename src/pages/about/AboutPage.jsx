@@ -53,6 +53,7 @@ export default function AboutPage() {
         academicPath_en: t.academicPath_en ? t.academicPath_en.split('\n').filter(line => line.trim()) : [],
         academicPath_de: t.academicPath_de ? t.academicPath_de.split('\n').filter(line => line.trim()) : [],
       }));
+      console.log("✅ بيانات 'من نحن' تم جلبها:", data);
       setAbout(data);
     } catch (err) {
       console.error("❌ خطأ أثناء التحميل:", err);
