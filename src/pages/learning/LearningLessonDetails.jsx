@@ -13,7 +13,7 @@ export default function LearningLessonDetails() {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [videoQuality, setVideoQuality] = useState("480p");
+  const [videoQuality, setVideoQuality] = useState("720p");
   const [editedLesson, setEditedLesson] = useState({
     name: "",
     name_ar: "",
@@ -449,9 +449,8 @@ export default function LearningLessonDetails() {
                   onChange={(e) => setVideoQuality(e.target.value)}
                   className="border rounded p-2"
                 >
-                  <option value="480p">480p</option>
-                  <option value="720p">720p</option>
-                  <option value="1080p">1080p</option>
+                  <option value="480p">480p - جودة منخفضة (سريعة)</option>
+                  <option value="720p">720p - جودة متوسطة (موصى به)</option>
                 </select>
               </div>
 
