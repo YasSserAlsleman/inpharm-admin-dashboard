@@ -96,7 +96,7 @@ export default function VirtualPharmacyLessonDetails() {
     const qualityField = `${baseField.replace('videoUrl', `videoUrl_${quality}`)}`;
     const url = lesson[qualityField] || baseField;
 
-    return url?.startsWith("http") ? url : `${BASE_FILE_URL}${url}`;
+    return url?.startsWith("http") ? url : `${BASE_FILE_URL}/uploads${url}`;
   };
 
   const getPdfUrl = (lesson, field) => {
