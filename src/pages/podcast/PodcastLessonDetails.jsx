@@ -4,6 +4,7 @@ import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import { useParams } from "react-router-dom";
 import { BASE_FILE_URL } from '../../config/config';
+import LinkableText from "../../components/LinkableText";
 
 export default function PodcastLessonDetails() {
     const { t,i18n } = useTranslation();
@@ -172,15 +173,17 @@ export default function PodcastLessonDetails() {
         }
     };
 
-    const handleAddComment = async (text, parentId = null) => {
+    const handleAddComment = async (text, imagefile, parentId = null) => {
         if (!text.trim()) return;
         try {
-            await axios.post("/comments", {
-                lessonId,
-                parentId: parentId || null,
-                userName: "Admin",
-                userRole: "admin",
-                text,
+            const formData = new FormData();
+            formData.append("lessonId", lessonId);
+            formData.append("text", text);
+            if (parentId) formData.append("parentId", parentId);
+            if (imagefile) formData.append("commentImage", imagefile);
+
+            await axios.post("/comments", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
             });
             fetchComments();
         } catch (err) {
@@ -524,6 +527,7 @@ export default function PodcastLessonDetails() {
 
 function CommentItem({ comment, onReply, onDeleteComment }) {
     const [replyText, setReplyText] = useState("");
+    const [replyImage, setReplyImage] = useState(null);
 
     return (
         <div className="border rounded p-3">
@@ -537,42 +541,88 @@ function CommentItem({ comment, onReply, onDeleteComment }) {
                 </button>
             </div>
 
-            <p className="text-gray-700">{comment.text}</p>
+            <p className="text-gray-700"><LinkableText text={comment.text} className="text-gray-700" /></p>
+
+            {/* 🖼️ عرض صورة التعليق إذا كانت موجودة */}
+            {comment.commentImageUrl && (
+                <div className="mt-2 mb-2">
+                    <img 
+                        src={`${BASE_FILE_URL}${comment.commentImageUrl}`} 
+                        alt="comment" 
+                        className="max-w-xs max-h-64 rounded border"
+                        onError={(e) => {
+                            e.target.src = "";
+                            e.target.style.display = "none";
+                        }}
+                    />
+                </div>
+            )}
 
             <div className="mt-2">
-                <input
-                    type="text"
-                    placeholder="رد..."
-                    className="border rounded p-1 text-sm w-2/3"
-                    value={replyText}
-                    onChange={(e) => setReplyText(e.target.value)}
-                />
-                <button
-                    className="ml-2 bg-green-500 text-white px-2 py-1 rounded text-sm"
-                    onClick={() => {
-                        if (replyText.trim()) {
-                            onReply(replyText, comment._id);
-                            setReplyText("");
-                        }
-                    }}
-                >
-                    رد
-                </button>
+                <div className="flex gap-2">
+                    <input
+                        type="text"
+                        placeholder="رد..."
+                        className="border rounded p-1 text-sm w-2/3"
+                        value={replyText}
+                        onChange={(e) => setReplyText(e.target.value)}
+                    />
+                    <input
+                        type="file"
+                        accept="image/*"
+                        className="text-sm"
+                        onChange={(e) => setReplyImage(e.target.files?.[0])}
+                        title="اختر صورة للرد"
+                    />
+                    <button
+                        className="ml-2 bg-green-500 text-white px-2 py-1 rounded text-sm"
+                        onClick={() => {
+                            if (replyText.trim()) {
+                                onReply(replyText, replyImage, comment._id);
+                                setReplyText("");
+                                setReplyImage(null);
+                            }
+                        }}
+                    >
+                        رد
+                    </button>
+                </div>
+                {replyImage && (
+                    <p className="text-xs text-gray-600 mt-1">
+                        ✓ تم اختيار صورة: {replyImage.name}
+                    </p>
+                )}
             </div>
 
             {comment.replies && comment.replies.length > 0 && (
                 <div className="ml-6 mt-3 border-l pl-3">
                     {comment.replies.map((r, index) => (
-                        <div key={index} className="flex justify-between text-sm mb-1">
-                            <p>
-                                <strong>{r.userName || "مستخدم"}:</strong> {r.text}
-                            </p>
-                            <button
-                                className="text-red-500 text-xs"
-                                onClick={() => onDeleteComment(r._id)}
-                            >
-                                حذف الرد
-                            </button>
+                        <div key={index}>
+                            <div className="flex justify-between text-sm mb-1">
+                                <div>
+                                    <p>
+                                        <strong>{r.userName || "مستخدم"}:</strong> <LinkableText text={r.text} />
+                                    </p>
+                                    {/* 🖼️ عرض صورة الرد إذا كانت موجودة */}
+                                    {r.commentImageUrl && (
+                                        <img 
+                                            src={`${BASE_FILE_URL}${r.commentImageUrl}`} 
+                                            alt="reply" 
+                                            className="max-w-xs max-h-48 rounded border mt-1"
+                                            onError={(e) => {
+                                                e.target.src = "";
+                                                e.target.style.display = "none";
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                                <button
+                                    className="text-red-500 text-xs"
+                                    onClick={() => onDeleteComment(r._id)}
+                                >
+                                    حذف الرد
+                                </button>
+                            </div>
                         </div>
                     ))}
                 </div>

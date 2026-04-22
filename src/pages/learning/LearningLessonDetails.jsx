@@ -4,6 +4,7 @@ import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import { useParams } from "react-router-dom";
 import { BASE_FILE_URL } from '../../config/config';
+import LinkableText from "../../components/LinkableText";
 
 export default function LearningLessonDetails() {
   const { i18n, t } = useTranslation();
@@ -39,7 +40,8 @@ export default function LearningLessonDetails() {
     videoPreview: null,
     sources: [{ title: "", link: "" }],
   });
-
+  const [sending, setSending] = useState(false);
+const [newCommentImage, setNewCommentImage] = useState(null);
   // دوال إدارة المصادر
   const addSource = () => {
     setEditedLesson({
@@ -182,19 +184,29 @@ export default function LearningLessonDetails() {
     }
   };
 
-  const handleAddComment = async (text, parentId = null) => {
-    if (!text.trim()) return;
+  const handleAddComment = async (text, imagefile, parentId = null) => {
+    if (sending) return;
+    setSending(true);
+
     try {
-      await axios.post("/comments", {
-        lessonId,
-        parentId: parentId || null,
-        userName: "Admin",
-        userRole: "admin",
-        text,
+      if (!text.trim() && !imagefile) return;
+
+      const formData = new FormData();
+      formData.append("lessonId", lessonId);
+      formData.append("text", text);
+
+      if (parentId) formData.append("parentId", parentId);
+      if (imagefile) formData.append("commentImage", imagefile);
+
+      await axios.post("/comments", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
-      fetchComments();
+
+      await fetchComments();
     } catch (err) {
       console.error(t('common.error'), err);
+    } finally {
+      setSending(false);
     }
   };
 
@@ -218,11 +230,10 @@ export default function LearningLessonDetails() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-sm font-bold ${
-              activeTab === tab
+            className={`px-4 py-2 text-sm font-bold ${activeTab === tab
                 ? "border-b-2 border-blue-600 text-blue-600"
                 : "text-gray-500"
-            }`}
+              }`}
           >
             {tab === "video" ? `🎥 ${t('lessons.videoAndDescription')}` : `💬 ${t('lessons.comments')}`}
           </button>
@@ -237,9 +248,8 @@ export default function LearningLessonDetails() {
               {getLocalizedValue(lesson, 'name', i18n.language) || lesson.name}
             </h2>
             <button
-              className={`px-3 py-1 rounded text-white ${
-                isEditing ? "bg-gray-500" : "bg-yellow-500"
-              }`}
+              className={`px-3 py-1 rounded text-white ${isEditing ? "bg-gray-500" : "bg-yellow-500"
+                }`}
               onClick={() => setIsEditing(!isEditing)}
             >
               {isEditing ? `❌ ${t('lessons.cancelEdit')}` : `✏️ ${t('lessons.edit')}`}
@@ -519,11 +529,19 @@ export default function LearningLessonDetails() {
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
             />
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setNewCommentImage(e.target.files?.[0])}
+            />
             <button
+              disabled={sending}
               className="bg-blue-600 text-white px-4 py-2 rounded"
-              onClick={() => {
-                handleAddComment(newComment);
+              onClick={async () => {
+                await handleAddComment(newComment, newCommentImage);
                 setNewComment("");
+                setNewCommentImage(null);
               }}
             >
               إرسال
@@ -552,6 +570,7 @@ export default function LearningLessonDetails() {
 
 function CommentItem({ comment, onReply, onDeleteComment }) {
   const [replyText, setReplyText] = useState("");
+  const [replyImage, setReplyImage] = useState(null);
 
   return (
     <div className="border rounded p-3">
@@ -565,42 +584,88 @@ function CommentItem({ comment, onReply, onDeleteComment }) {
         </button>
       </div>
 
-      <p className="text-gray-700">{comment.text}</p>
+      <p className="text-gray-700"><LinkableText text={comment.text} className="text-gray-700" /></p>
+
+      {/* 🖼️ عرض صورة التعليق إذا كانت موجودة */}
+      {comment.commentImageUrl && (
+        <div className="mt-2 mb-2">
+          <img
+            src={`${BASE_FILE_URL}${comment.commentImageUrl}`}
+            alt="comment"
+            className="max-w-xs max-h-64 rounded border"
+            onError={(e) => {
+              e.target.src = "";
+              e.target.style.display = "none";
+            }}
+          />
+        </div>
+      )}
 
       <div className="mt-2">
-        <input
-          type="text"
-          placeholder="رد..."
-          className="border rounded p-1 text-sm w-2/3"
-          value={replyText}
-          onChange={(e) => setReplyText(e.target.value)}
-        />
-        <button
-          className="ml-2 bg-green-500 text-white px-2 py-1 rounded text-sm"
-          onClick={() => {
-            if (replyText.trim()) {
-              onReply(replyText, comment._id);
+        <div className="flex gap-2">
+          <input
+            type="text"
+            placeholder="رد..."
+            className="border rounded p-1 text-sm w-2/3"
+            value={replyText}
+            onChange={(e) => setReplyText(e.target.value)}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            className="text-sm"
+            onChange={(e) => setReplyImage(e.target.files?.[0])}
+            title="اختر صورة للرد"
+          />
+          <button
+            className="ml-2 bg-green-500 text-white px-2 py-1 rounded text-sm"
+            onClick={() => {
+              if (!replyText.trim() && !replyImage) return;
+              onReply(replyText, replyImage, comment._id);
               setReplyText("");
-            }
-          }}
-        >
-          رد
-        </button>
+              setReplyImage(null);
+
+            }}
+          >
+            رد
+          </button>
+        </div>
+        {replyImage && (
+          <p className="text-xs text-gray-600 mt-1">
+            ✓ تم اختيار صورة: {replyImage.name}
+          </p>
+        )}
       </div>
 
       {comment.replies && comment.replies.length > 0 && (
         <div className="ml-6 mt-3 border-l pl-3">
           {comment.replies.map((r, index) => (
-            <div key={index} className="flex justify-between text-sm mb-1">
-              <p>
-                <strong>{r.userName || "مستخدم"}:</strong> {r.text}
-              </p>
-              <button
-                className="text-red-500 text-xs"
-                onClick={() => onDeleteComment(r._id)}
-              >
-                حذف الرد
-              </button>
+            <div key={r._id}>
+              <div className="flex justify-between text-sm mb-1">
+                <div>
+                  <p>
+                    <strong>{r.userName || "مستخدم"}:</strong> <LinkableText text={r.text} />
+                  </p>
+                  {/* 🖼️ عرض صورة الرد إذا كانت موجودة */}
+                  {r.commentImageUrl && (
+                    <img
+                      src={`${BASE_FILE_URL}${r.commentImageUrl}`}
+                      alt="reply"
+                      className="max-w-xs max-h-48 rounded border mt-1"
+                      onError={(e) => {
+                        e.target.src = "";
+                        e.target.style.display = "none";
+                      }}
+                    />
+                  )}
+                </div>
+                <button
+                  className="text-red-500 text-xs"
+                  onClick={() => onDeleteComment(r._id)}
+                >
+                  حذف الرد
+                </button>
+              </div>
             </div>
           ))}
         </div>

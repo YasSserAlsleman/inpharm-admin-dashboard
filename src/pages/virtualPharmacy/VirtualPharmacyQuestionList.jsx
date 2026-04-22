@@ -112,6 +112,14 @@ export default function LearningQuestionList() {
   const handleAddQuestion = async () => {
     if (!newQuestionTextEn.trim()) return alert("أدخل نص السؤال بالإنجليزية على الأقل!");
     if (options.length === 0) return alert("أضف على الأقل خياراً واحداً!");
+    
+    // التحقق من وجود خيار واحد على الأقل مع نص
+    const hasValidOptions = options.some(opt => opt.text_ar.trim() || opt.text_en.trim() || opt.text_de.trim());
+    if (!hasValidOptions) return alert("يجب أن يحتوي كل خيار على نص بإحدى اللغات!");
+    
+    // التحقق من وجود إجابة صحيحة واحدة على الأقل
+    const hasCorrectAnswer = options.some(opt => opt.isCorrect);
+    if (!hasCorrectAnswer) return alert("يجب تحديد إجابة صحيحة واحدة على الأقل!");
     try {
       const formData = new FormData();
       formData.append("lessonId", lessonId);

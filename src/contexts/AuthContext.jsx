@@ -7,12 +7,14 @@ const AuthContext = createContext(null);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const isAuthenticated = !!user;
-
+const [loading, setLoading] = useState(true);
   // تحقق من وجود token عند تحميل التطبيق
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
-      fetchCurrentUser(token);
+      fetchCurrentUser(token). finally(() => setLoading(false)) ;
+    }else {
+      setLoading(false);
     }
   }, []);
 
@@ -25,7 +27,7 @@ export const AuthProvider = ({ children }) => {
       // تحقق من الدور
       if (!['admin', 'manager'].includes(res.data.role)) {
         logout();
-        return;
+        return null; // إرجاع null للمستخدم غير المسموح
       }
 
       setUser(currentUser);
@@ -64,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, loading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/axiosClient";
 import { useParams } from "react-router-dom";
+import LinkableText from "../../components/LinkableText";
 
 export default function PodcastLessonComments() {
   const { lessonId } = useParams();
@@ -59,12 +60,12 @@ export default function PodcastLessonComments() {
       {comments.map((c) => (
         <div key={c._id} className="border-t pt-3 mt-3">
           <p>
-            <strong>{c.userName}:</strong> {c.text}
+            <strong>{c.userName}:</strong> <LinkableText text={c.text} />
           </p>
           <div className="ml-6 mt-2 space-y-1">
             {c.replies.map((r, i) => (
               <p key={i} className="text-gray-600 text-sm">
-                ↳ <strong>{r.userName}:</strong> {r.text}
+                ↳ <strong>{r.userName}:</strong> <LinkableText text={r.text} />
               </p>
             ))}
           </div>
