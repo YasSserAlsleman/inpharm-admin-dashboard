@@ -13,6 +13,7 @@ export default function PodcastQuestionList() {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
   const { i18n } = useTranslation();
+  const [editingQuestionId, setEditingQuestionId] = useState(null); // لتتبع السؤال المراد تعديله
 
   // نص السؤال + صورة السؤال
   const [newQuestionText, setNewQuestionText] = useState("");
@@ -115,14 +116,16 @@ export default function PodcastQuestionList() {
     if (!newQuestionTextEn.trim()) return alert("أدخل نص السؤال بالإنجليزية على الأقل!");
     if (options.length === 0) return alert("أضف على الأقل خياراً واحداً!");
     
-    // التحقق من وجود خيار واحد على الأقل مع نص
-    const hasValidOptions = options.some(opt => opt.text_ar.trim() || opt.text_en.trim() || opt.text_de.trim());
-    if (!hasValidOptions) return alert("يجب أن يحتوي كل خيار على نص بإحدى اللغات!");
+    // التحقق من وجود خيار واحد على الأقل مع نص أو صورة
+    const hasValidOptions = options.some(opt => 
+      (opt.text_ar?.trim() || opt.text_en?.trim() || opt.text_de?.trim() || opt.image || opt.preview)
+    );
+    if (!hasValidOptions) return alert("يجب أن يحتوي كل خيار على نص أو صورة!");
     
     // التحقق من وجود إجابة صحيحة واحدة على الأقل
     const hasCorrectAnswer = options.some(opt => opt.isCorrect);
     if (!hasCorrectAnswer) return alert("يجب تحديد إجابة صحيحة واحدة على الأقل!");
-
+ 
     try {
       const formData = new FormData();
       formData.append("lessonId", lessonId);
@@ -152,30 +155,75 @@ export default function PodcastQuestionList() {
         if (opt.image) formData.append("optionImages", opt.image);
       });
 
+      if (editingQuestionId) {
+        // تعديل سؤال موجود
+        await axios.put(`/question/${editingQuestionId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+        setEditingQuestionId(null);
+        alert("✅ تم تحديث السؤال بنجاح");
+      } else {
+        // إضافة سؤال جديد
+        await axios.post(`/question`, formData, {
+          headers: { "Content-Type": "multipart/form-data" }
+        });
+        alert("✅ تم إضافة السؤال بنجاح");
+      }
 
-      await axios.post(`/question`, formData, {
-        headers: { "Content-Type": "multipart/form-data" }
-      });
-
-      setNewQuestionText("");
-      setNewQuestionTextAr("");
-      setNewQuestionTextEn("");
-      setNewQuestionTextDe("");
-      setQuestionImage(null);
-      setQuestionImagePreview(null);
-      setNoteText("");
-      setNoteTextAr("");
-      setNoteTextEn("");
-      setNoteTextDe("");
-      setNoteImage(null);
-      setNoteImagePreview(null);
-      setOptions([{ text_ar: "", text_en: "", text_de: "", image: null, preview: null, isCorrect: false }]);
-      setIsMultipleCorrect(false);
-
+      // إعادة تعيين النموذج
+      resetForm();
       fetchLessonAndQuestions();
     } catch (err) {
-      console.error("❌ خطأ أثناء إضافة السؤال:", err);
+      console.error("❌ خطأ أثناء معالجة السؤال:", err);
     }
+  };
+
+  const resetForm = () => {
+    setNewQuestionText("");
+    setNewQuestionTextAr("");
+    setNewQuestionTextEn("");
+    setNewQuestionTextDe("");
+    setQuestionImage(null);
+    setQuestionImagePreview(null);
+    setNoteText("");
+    setNoteTextAr("");
+    setNoteTextEn("");
+    setNoteTextDe("");
+    setNoteImage(null);
+    setNoteImagePreview(null);
+    setOptions([{ text_ar: "", text_en: "", text_de: "", image: null, preview: null, isCorrect: false }]);
+    setIsMultipleCorrect(false);
+    setSources([""]);
+    setEditingQuestionId(null);
+  };
+
+  const handleEditQuestion = (question) => {
+    setEditingQuestionId(question._id);
+    setNewQuestionTextAr(question.text_ar || "");
+    setNewQuestionTextEn(question.text_en || "");
+    setNewQuestionTextDe(question.text_de || "");
+    setQuestionImagePreview(question.image ? `${BASE_FILE_URL}/${question.image}` : null);
+    setNoteTextAr(question.noteText_ar || "");
+    setNoteTextEn(question.noteText_en || "");
+    setNoteTextDe(question.noteText_de || "");
+    setNoteImagePreview(question.noteImage ? `${BASE_FILE_URL}/${question.noteImage}` : null);
+    setOptions(question.options.map(opt => ({
+      text_ar: opt.text_ar || "",
+      text_en: opt.text_en || "",
+      text_de: opt.text_de || "",
+      image: null,
+      preview: opt.image ? `${BASE_FILE_URL}/${opt.image}` : null,
+      isCorrect: opt.isCorrect
+    })));
+    setIsMultipleCorrect(question.isMultipleCorrect || false);
+    setSources(question.sources || [""]);
+    
+    // السحب للأعلى
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleCancelEdit = () => {
+    resetForm();
   };
 
   const handleDeleteQuestion = async (id) => {
@@ -375,8 +423,20 @@ export default function PodcastQuestionList() {
 
 
  <div className="flex gap-2 mt-2">
-          <button className="bg-primary text-white px-4 py-2 rounded" onClick={handleAddQuestion}>✅ إضافة السؤال</button>
-        </div>
+          <button 
+            className="bg-primary text-white px-4 py-2 rounded" 
+            onClick={handleAddQuestion}
+          >
+            {editingQuestionId ? "✏️ تحديث السؤال" : "✅ إضافة السؤال"}
+          </button>
+          {editingQuestionId && (
+            <button 
+              className="bg-gray-500 text-white px-4 py-2 rounded" 
+              onClick={handleCancelEdit}
+            >
+              ✖ إلغاء التعديل
+            </button>
+          )}
 
       </div>
 
@@ -419,7 +479,20 @@ export default function PodcastQuestionList() {
 
 
               </ul>
-              <button onClick={() => handleDeleteQuestion(q._id)} className="bg-red-500 text-white px-3 py-1 rounded mt-2">حذف</button>
+              <div className="flex gap-2 mt-3">
+                <button 
+                  onClick={() => handleEditQuestion(q)} 
+                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                >
+                  ✏️ تعديل
+                </button>
+                <button 
+                  onClick={() => handleDeleteQuestion(q._id)} 
+                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                >
+                  🗑️ حذف
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -429,5 +502,7 @@ export default function PodcastQuestionList() {
         <Link to={-1} className="text-blue-600 hover:underline">← الرجوع إلى الدروس</Link>
       </div>
     </div>
+    
+      </div>
   );
 }

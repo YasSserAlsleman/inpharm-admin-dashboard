@@ -102,6 +102,7 @@ const handleToggleHide = async (topicId, isHidden) => {
   const handleSaveEdit = async (topic) => {
     try {
       const formData = new FormData();
+    
       formData.append("name", topic.editName);
       formData.append("description", topic.editDescription);
       if (topic.editImageFile) formData.append("image", topic.editImageFile);

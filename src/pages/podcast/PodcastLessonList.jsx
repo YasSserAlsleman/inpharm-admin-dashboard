@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import i18n from "../../i18n";
+import MediaStatusIndicator from "../../components/MediaStatusIndicator";
 
 export default function PodcastLessonList() {
   const { mainId } = useParams();
+  const navigate = useNavigate();
   const [lecture, setLecture] = useState(null);
   const [lessons, setLessons] = useState([]);
 
@@ -359,17 +361,25 @@ const[loading, setLoading] = useState(true);
               <tr className="bg-gray-100 text-left">
                 <th className="p-2">#</th>
                 <th className="p-2">{t('lessons.lessonName')}</th>
+                <th className="p-2">🎙️ {t('lessons.media', 'الملفات')}</th>
                 <th className="p-2">{t('lessons.description')}</th>
                 <th className="p-2 text-center">{t('lessons.actions')}</th>
+                <th className="p-2 text-center">{t('lessons.hide', 'إخفاء')}</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody> 
               {lessons.map((lesson, index) => (
                 <tr key={lesson._id} className="border-t hover:bg-gray-50">
                   <td className="p-2">{index + 1}</td>
                   <td className="p-2 font-semibold text-gray-800">
                     {getLocalizedValue(lesson, "name", i18n.language) || lesson.name}
                   </td>
+                  
+                  {/* عمود الملفات الجديد */}
+                  <td className="p-2">
+                    <MediaStatusIndicator lesson={lesson} type="podcast" compact={true} />
+                  </td>
+                  
                   <td className="p-2 text-gray-600">
                     {getLocalizedValue(lesson, "description", i18n.language)
                       ? getLocalizedValue(lesson, "description", i18n.language).slice(0, 50) + "..."
@@ -378,39 +388,36 @@ const[loading, setLoading] = useState(true);
                       : "—"}
                   </td>
                   <td className="p-2 text-center">
-                    <div className="flex justify-center gap-3 text-lg">
-                      <Link
-                        to={`/podcastLesson/${lesson._id}/details`}
-                        title="عرض الدرس"
-                        className="hover:text-green-600"
-                      >   
-                        🎥
-                      </Link>
+                    <div className="flex justify-center gap-2 text-sm">
+                      <button
+                        onClick={() => navigate(`/podcastLesson/${lesson._id}/details`)}
+                        title="تعديل الدرس"
+                        className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition"
+                      >
+                        ✏️ تعديل
+                      </button>
                       <Link
                         to={`/podcastLesson/${lesson._id}/questions`}
                         title="الاختبار"
-                        className="hover:text-orange-500"
+                        className="text-orange-500 hover:text-orange-700 text-lg"
                       >
                         🧠
                       </Link>
-
                       <button
                         onClick={() => handleDeleteLesson(lesson._id)}
                         title="حذف"
-                        className="hover:text-red-600"
+                        className="text-red-600 hover:text-red-800 text-lg"
                       >
                         🗑
                       </button>
-                      {/* إضافة Toggle */}
-      <div className="mt-4">
-        <label>إخفاء من التطبيق الجوال</label>
-        <input
-          type="checkbox"
-          checked={lesson.isHidden}
-          onChange={(e) => handleToggleHide(lesson._id, e.target.checked)}
-        />
-      </div>
                     </div>
+                  </td>
+                  <td className="p-2 text-center">
+                    <input
+                      type="checkbox"
+                      checked={lesson.isHidden}
+                      onChange={(e) => handleToggleHide(lesson._id, e.target.checked)}
+                    />
                   </td>
                 </tr>
               ))}

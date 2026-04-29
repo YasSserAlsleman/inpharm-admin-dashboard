@@ -17,6 +17,9 @@ const Codes = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [snackbar, setSnackbar] = useState({open:false,message:'',severity:'success'});
+  const [whatsappPhone, setWhatsappPhone] = useState('');
+  const [isEditingPhone, setIsEditingPhone] = useState(false);
+  const [phoneTempValue, setPhoneTempValue] = useState('');
   const limit = 10;
 
   const fetchPlans = async () => {
@@ -24,6 +27,27 @@ const Codes = () => {
       const res = await axios.get('/plans');
       setPlans(res.data);
     } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const fetchWhatsAppPhone = async () => {
+    try {
+      const res = await axios.get('/settings/whatsapp-phone');
+      setWhatsappPhone(res.data.phone || '');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const saveWhatsAppPhone = async () => {
+    try {
+      await axios.post('/settings/whatsapp-phone', { phone: phoneTempValue });
+      setWhatsappPhone(phoneTempValue);
+      setIsEditingPhone(false);
+      setSnackbar({open:true,message:'رقم WhatsApp تم حفظه بنجاح',severity:'success'});
+    } catch (err) {
+      setSnackbar({open:true,message:'حدث خطأ في حفظ الرقم',severity:'error'});
       console.error(err);
     }
   };
@@ -43,6 +67,7 @@ const Codes = () => {
 
   useEffect(() => {
     fetchPlans();
+    fetchWhatsAppPhone();
   }, []);
 
   useEffect(() => {
@@ -94,28 +119,86 @@ const   durationM =   (durationDays) => {
   return (
     <Box sx={{ padding: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb:3 }}>
-        <Typography variant="h4">Codes Management</Typography>
+        <Typography variant="h4">إدارة الأكواد</Typography>
         <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setModalOpen(true)}>
-          Generate Codes
+          توليد أكواد
         </Button>
       </Box>
 
+      {/* قسم إعدادات رقم WhatsApp */}
+      <Box sx={{ 
+        backgroundColor: '#f5f5f5', 
+        padding: 2, 
+        borderRadius: 2, 
+        marginBottom: 3,
+        border: '1px solid #ddd'
+      }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb:2 }}>
+          <Typography variant="h6">⚙️ إعدادات WhatsApp</Typography>
+        </Box>
+        
+        {!isEditingPhone ? (
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Box>
+              <Typography variant="body2" sx={{ color: '#666' }}>رقم WhatsApp للتواصل:</Typography>
+              <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold' }}>
+                {whatsappPhone || 'لم يتم تعيين رقم'}
+              </Typography>
+            </Box>
+            <Button 
+              variant="contained" 
+              color="primary"
+              onClick={() => {
+                setIsEditingPhone(true);
+                setPhoneTempValue(whatsappPhone);
+              }}
+            >
+              تعديل
+            </Button>
+          </Box>
+        ) : (
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
+            <TextField 
+              label="رقم WhatsApp"
+              placeholder="+966541234567"
+              value={phoneTempValue}
+              onChange={(e) => setPhoneTempValue(e.target.value)}
+              fullWidth
+              variant="outlined"
+            />
+            <Button 
+              variant="contained" 
+              color="success"
+              onClick={saveWhatsAppPhone}
+            >
+              حفظ
+            </Button>
+            <Button 
+              variant="outlined"
+              onClick={() => setIsEditingPhone(false)}
+            >
+              إلغاء
+            </Button>
+          </Box>
+        )}
+      </Box>
+
       <Box sx={{ display:'flex', gap:2, mb:2 }}>
-        <TextField select label="Filter Plan" value={filterPlan} onChange={(e)=>{setFilterPlan(e.target.value); setPage(1);}} sx={{minWidth:150}}>
-          <MenuItem value="">All Plans</MenuItem>
+        <TextField select label="تصفية الخطة" value={filterPlan} onChange={(e)=>{setFilterPlan(e.target.value); setPage(1);}} sx={{minWidth:150}}>
+          <MenuItem value="">جميع الخطط</MenuItem>
           {plans.map(plan=>(
             <MenuItem key={plan._id} value={plan._id}>{plan.accessType} ({durationM(plan.durationDays)})</MenuItem>
           ))}
         </TextField>
 
-        <TextField select label="Status" value={filterStatus} onChange={(e)=>{setFilterStatus(e.target.value); setPage(1);}} sx={{minWidth:150}}>
-          <MenuItem value="">All</MenuItem>
-          <MenuItem value="used">Used</MenuItem>
-          <MenuItem value="unused">Unused</MenuItem>
+        <TextField select label="الحالة" value={filterStatus} onChange={(e)=>{setFilterStatus(e.target.value); setPage(1);}} sx={{minWidth:150}}>
+          <MenuItem value="">الكل</MenuItem>
+          <MenuItem value="used">مستخدم</MenuItem>
+          <MenuItem value="unused">غير مستخدم</MenuItem>
         </TextField>
       </Box>
   <Button variant="contained" color="primary" onClick={exportCodes} sx={{ mr: 2 }}>
-      Export CSV
+      تصدير CSV
     </Button>
 
 

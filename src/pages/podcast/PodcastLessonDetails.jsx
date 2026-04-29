@@ -3,8 +3,9 @@ import { useTranslation } from "react-i18next";
 import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import { useParams } from "react-router-dom";
-import { BASE_FILE_URL } from '../../config/config';
-import LinkableText from "../../components/LinkableText";
+import { BASE_FILE_URL } from '../../config/config';import RelatedLessonsModal from "../../components/RelatedLessonsModal";import LinkableText from "../../components/LinkableText";
+import MediaStatusIndicator from "../../components/MediaStatusIndicator";
+import Swal from "sweetalert2";
 
 export default function PodcastLessonDetails() {
     const { t,i18n } = useTranslation();
@@ -14,6 +15,8 @@ export default function PodcastLessonDetails() {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState("");
     const [isEditing, setIsEditing] = useState(false);
+    const [showRelatedLessonsModal, setShowRelatedLessonsModal] = useState(false);
+    const [relatedLessons, setRelatedLessons] = useState([]);
     const [editedLesson, setEditedLesson] = useState({
         name: "",
         name_ar: "",
@@ -48,6 +51,7 @@ export default function PodcastLessonDetails() {
         try {
             const res = await axios.get(`/podcastLesson/${lessonId}`);
             setLesson(res.data);
+            setRelatedLessons(res.data.relatedLessons || []);
             setEditedLesson({
                 name: res.data.name || "",
                 name_ar: res.data.name_ar || "",
@@ -121,6 +125,29 @@ export default function PodcastLessonDetails() {
       });
     };
 
+    const handleSaveRelatedLessons = async (selected) => {
+      try {
+        await axios.put(`/podcastLesson/${lessonId}/relatedLessons`, {
+          relatedLessons: selected
+        });
+        setRelatedLessons(selected);
+        setShowRelatedLessonsModal(false);
+        Swal.fire({
+          title: "تم بنجاح",
+          text: "تم حفظ الدروس المرتبطة بنجاح",
+          icon: "success",
+          timer: 2000
+        });
+      } catch (err) {
+        console.error("خطأ:", err);
+        Swal.fire({
+          title: "خطأ",
+          text: err.response?.data?.message || "حدث خطأ أثناء حفظ الدروس المرتبطة",
+          icon: "error"
+        });
+      }
+    };
+
     const handleUpdateLesson = async () => {
         try {
             const formData = new FormData();
@@ -164,12 +191,26 @@ export default function PodcastLessonDetails() {
                 headers: { "Content-Type": "multipart/form-data" },
             });
 
+            await axios.put(`/podcastLesson/${lessonId}/relatedLessons`, {
+                relatedLessons: relatedLessons
+            });
+
+            setShowRelatedLessonsModal(false);
             setIsEditing(false);
-            fetchLesson();
-            alert("✅ تم تحديث بيانات الدرس بنجاح!");
+            
+            Swal.fire({
+              title: "تم بنجاح",
+              text: "تم تحديث بيانات الدرس بنجاح!",
+              icon: "success",
+              timer: 2000
+            });
         } catch (err) {
             console.error("❌ خطأ أثناء تعديل الدرس:", err);
-            alert("حدث خطأ أثناء حفظ التعديلات!");
+            Swal.fire({
+              title: "خطأ",
+              text: err.response?.data?.message || "حدث خطأ أثناء حفظ التعديلات!",
+              icon: "error"
+            });
         }
     };
 
@@ -224,17 +265,25 @@ export default function PodcastLessonDetails() {
             {activeTab === "audio" && (
                 <div>
                     <div className="flex justify-between items-center mb-3">
-<h2 className="text-xl font-bold">
-                      {getLocalizedValue(lesson, 'name', i18n.language) || lesson.name}
-                    </h2>
-                    <button
-                        className={`px-3 py-1 rounded text-white ${isEditing ? "bg-gray-500" : "bg-yellow-500"
-                            }`}
-                        onClick={() => setIsEditing(!isEditing)}
-                    >
-                        {isEditing ? `❌ ${t('lessons.cancelEdit')}` : `✏️ ${t('lessons.edit')}`}
-                    </button>
-                </div>
+                        <h2 className="text-xl font-bold">
+                          {getLocalizedValue(lesson, 'name', i18n.language) || lesson.name}
+                        </h2>
+                        <button
+                            className={`px-3 py-1 rounded text-white ${isEditing ? "bg-gray-500" : "bg-yellow-500"
+                                }`}
+                            onClick={() => setIsEditing(!isEditing)}
+                        >
+                            {isEditing ? `❌ ${t('lessons.cancelEdit')}` : `✏️ ${t('lessons.edit')}`}
+                        </button>
+                    </div>
+                    
+                    {/* مؤشر حالة الملفات */}
+                    {lesson && (
+                      <div className="mb-4 bg-gray-50 p-3 rounded border border-gray-200">
+                        <h3 className="font-semibold mb-2">📊 حالة الملفات:</h3>
+                        <MediaStatusIndicator lesson={lesson} type="podcast" compact={false} />
+                      </div>
+                    )}
 
                 {isEditing ? (
                     <div className="space-y-3">
@@ -420,6 +469,43 @@ export default function PodcastLessonDetails() {
                                 ))}
                             </div>
 
+                            {/* قسم الدروس المرتبطة */}
+                            <div className="md:col-span-2 bg-purple-50 p-4 rounded border-2 border-purple-200">
+                                <div className="flex justify-between items-center mb-3">
+                                    <label className="block text-sm font-medium text-gray-700 font-semibold">🔗 الدروس المرتبطة</label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowRelatedLessonsModal(true)}
+                                        className="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700"
+                                    >
+                                        ➕ إضافة دروس مرتبطة
+                                    </button>
+                                </div>
+                                {relatedLessons.length > 0 ? (
+                                    <div className="space-y-2">
+                                        {relatedLessons.map((related, index) => (
+                                            <div
+                                                key={index}
+                                                className="bg-white p-3 rounded border border-purple-300 flex justify-between items-center"
+                                            >
+                                                <div>
+                                                    <p className="font-medium text-gray-800">{related.name}</p>
+                                                    <p className="text-xs text-gray-600">
+                                                        {related.lessonType === "learning"
+                                                            ? "📚 درس تعلم"
+                                                            : related.lessonType === "podcast"
+                                                            ? "🎙️ درس بودكاست"
+                                                            : "💊 درس صيدلية"}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-gray-500 italic text-sm">لم تضف أي دروس مرتبطة بعد</p>
+                                )}
+                            </div>
+
                             <button
                                 className="bg-blue-600 text-white px-4 py-2 rounded"
                                 onClick={handleUpdateLesson}
@@ -477,6 +563,54 @@ export default function PodcastLessonDetails() {
                                     />
                                 </div>
                             )}
+
+                            {/* عرض الدروس المرتبطة */}
+                            {relatedLessons && relatedLessons.length > 0 && (
+                                <div className="mt-6 bg-purple-50 p-4 rounded border-2 border-purple-200">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h3 className="font-semibold text-lg">🔗 الدروس المرتبطة</h3>
+                                        {/* <button
+                                            type="button"
+                                            onClick={() => setShowRelatedLessonsModal(true)}
+                                            className="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700"
+                                        >
+                                            ✏️ تعديل
+                                        </button> */}
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                        {relatedLessons.map((related, index) => (
+                                            <div
+                                                key={index}
+                                                className="bg-white p-3 rounded border border-purple-300 hover:shadow-md transition"
+                                            >
+                                                <p className="font-medium text-gray-800">{related.name}</p>
+                                                <p className="text-xs text-gray-600 mt-1">
+                                                    {related.lessonType === "learning"
+                                                        ? "📚 درس تعلم"
+                                                        : related.lessonType === "podcast"
+                                                        ? "🎙️ درس بودكاست"
+                                                        : "💊 درس صيدلية"}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            {/* إضافة خيار إضافة دروس مرتبطة إذا لم تكن هناك دروس */}
+                            {!relatedLessons || relatedLessons.length === 0 && (
+                                <div className="mt-6 bg-purple-50 p-4 rounded border-2 border-purple-200">
+                                    <div className="flex justify-between items-center">
+                                        <p className="text-gray-600 text-sm">لا توجد دروس مرتبطة</p>
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowRelatedLessonsModal(true)}
+                                            className="bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700"
+                                        >
+                                            ➕ إضافة دروس مرتبطة
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
@@ -521,6 +655,15 @@ export default function PodcastLessonDetails() {
                     )}
                 </div>
             )}
+
+            {/* Related Lessons Modal */}
+            <RelatedLessonsModal
+                isOpen={showRelatedLessonsModal}
+                onClose={() => setShowRelatedLessonsModal(false)}
+                relatedLessons={relatedLessons}
+                onSave={handleSaveRelatedLessons}
+                currentLessonId={lessonId}
+            />
         </div>
     );
 }
@@ -528,17 +671,100 @@ export default function PodcastLessonDetails() {
 function CommentItem({ comment, onReply, onDeleteComment }) {
     const [replyText, setReplyText] = useState("");
     const [replyImage, setReplyImage] = useState(null);
+    const [likes, setLikes] = useState(comment.likes || 0);
+    const [isLiked, setIsLiked] = useState(false);
+    const [reported, setReported] = useState(false);
+    const [reports] = useState(comment.reports || 0);
+
+    const handleLike = async () => {
+        try {
+            const res = await axios.post(`/comments/${comment._id}/like`);
+            setLikes(res.data.likes);
+            setIsLiked(res.data.isLiked);
+        } catch (err) {
+            console.error("خطأ في الإعجاب:", err);
+        }
+    };
+
+    const handleReport = async () => {
+        if (reported) {
+            alert("لقد أبلغت عن هذا التعليق بالفعل");
+            return;
+        }
+
+        const reason = prompt("اختر سبب الإبلاغ:\n1- محتوى غير مناسب\n2- لغة سيئة\n3- رسالة مزعجة\n4- أخرى");
+        
+        if (!reason) return;
+
+        try {
+            await axios.post(`/comments/${comment._id}/report`, { 
+                reason: reason || "محتوى غير مناسب"
+            });
+            setReported(true);
+            alert("تم الإبلاغ عن التعليق بنجاح");
+        } catch (err) {
+            alert(err.response?.data?.message || "فشل في الإبلاغ");
+        }
+    };
+
+    if (comment.isDeleted) {
+        return (
+            <div className="border rounded p-3 bg-gray-100 opacity-60">
+                <p className="text-gray-500 italic text-sm">تم حذف هذا التعليق</p>
+            </div>
+        );
+    }
 
     return (
         <div className="border rounded p-3">
-            <div className="flex justify-between items-center">
-                <p className="font-semibold text-gray-800">{comment.userName || "مستخدم"}</p>
-                <button
-                    className="text-red-600 text-sm"
-                    onClick={() => onDeleteComment(comment._id)}
-                >
-                    🗑️ حذف التعليق
-                </button>
+            <div className="flex justify-between items-start mb-2">
+                <div>
+                    <p className="font-semibold text-gray-800">{comment.userName || "مستخدم"}</p>
+                    <p className="text-xs text-gray-500">
+                        {comment.userType === "admin" ? "👨‍💼 مشرف" : 
+                         comment.userType === "manager" ? "👨‍🏫 معلم" : "👤 طالب"}
+                    </p>
+                </div>
+                <div className="flex gap-2">
+                    {/* زر الإعجاب */}
+                    <button
+                        onClick={handleLike}
+                        className={`px-2 py-1 rounded text-sm flex items-center gap-1 ${
+                            isLiked 
+                                ? "bg-red-100 text-red-600" 
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                        title="إعجاب"
+                    >
+                        ❤️ {likes}
+                    </button>
+
+                    {/* زر الإبلاغ */}
+                    <button
+                        onClick={handleReport}
+                        className={`px-2 py-1 rounded text-sm flex items-center gap-1 ${
+                            reported
+                                ? "bg-yellow-100 text-yellow-600"
+                                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                        title={reported ? "تم الإبلاغ" : "إبلاغ"}
+                    >
+                        🚩 {reports > 0 && reports}
+                    </button>
+
+                    {/* زر الحذف */}
+                    <button
+                        className="text-red-600 text-sm px-2 py-1 hover:bg-red-100 rounded"
+                        onClick={() => {
+                            if (window.confirm("هل تريد حذف هذا التعليق؟")) {
+                                onDeleteComment(comment._id);
+                            }
+                        }}
+                        title="حذف"
+                    >
+                        🗑️
+                    </button>
+                </div>
             </div>
 
             <p className="text-gray-700"><LinkableText text={comment.text} className="text-gray-700" /></p>
