@@ -10,10 +10,14 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
-  Divider
+  Divider,
+  Select,
+  MenuItem,
+  FormControl
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "../../api/axiosClient";
+import { useAuth } from "../../contexts/AuthContext";
 
 import { permissionGroups } from "../user/permissions";
 
@@ -26,12 +30,13 @@ const Managers = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [permissions, setPermissions] = useState({});
+  const { can, user: currentUser } = useAuth();
 
-  // جلب المدراء
+  // جلب الطاقم (مدراء وأدمن)
   const fetchManagers = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/users?role=manager");
+      const res = await axios.get("/users?role=staff");
       setManagers(res.data || []);
     } catch (err) {
       console.error(err);
@@ -80,6 +85,19 @@ const Managers = () => {
     }
   };
 
+  // تغيير الدور الوظيفي
+  const handleRoleChange = async (id, newRole) => {
+    try {
+      await axios.patch(`/users/${id}/role`, {
+        role: newRole
+      });
+      fetchManagers();
+    } catch (err) {
+      console.error(err);
+      alert("Failed to change role");
+    }
+  };
+
   // إنشاء أعمدة DataGrid من الصلاحيات
   const permissionColumns = permissionGroups.flatMap(group =>
     group.permissions.map(p => ({
@@ -89,6 +107,7 @@ const Managers = () => {
       renderCell: (params) => (
         <Checkbox
           checked={params?.row?.permissions?.[p.key] || false}
+          disabled={!can('updateManagerPermissions') || params.row._id === currentUser?.id}
           onChange={(e) =>
             updatePermissions(params.row._id, {
               ...(params.row.permissions || {}),
@@ -103,6 +122,24 @@ const Managers = () => {
   const columns = [
     { field: "name", headerName: "Name", width: 180 },
     { field: "email", headerName: "Email", width: 220 },
+    {
+      field: "role",
+      headerName: "Role",
+      width: 140,
+      renderCell: (params) => (
+        <Select
+          value={params.row.role}
+          size="small"
+          fullWidth
+          disabled={!can('changeUserRole') || params.row._id === currentUser?.id}
+          onChange={(e) => handleRoleChange(params.row._id, e.target.value)}
+        >
+          <MenuItem value="admin">Admin</MenuItem>
+          <MenuItem value="manager">Manager</MenuItem>
+          <MenuItem value="student">Student</MenuItem>
+        </Select>
+      )
+    },
     ...permissionColumns,
     {
       field: "createdAt",
@@ -118,13 +155,15 @@ const Managers = () => {
   return (
     <Box>
 
-      <Button
-        variant="contained"
-        onClick={() => setOpen(true)}
-        sx={{ mb: 2 }}
-      >
-        Create Manager
-      </Button>
+      {can('createManager') && (
+        <Button
+          variant="contained"
+          onClick={() => setOpen(true)}
+          sx={{ mb: 2 }}
+        >
+          Create Staff (Manager)
+        </Button>
+      )}
 
       <DataGrid
         rows={managers || []}
@@ -137,7 +176,7 @@ const Managers = () => {
       />
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="md">
-        <DialogTitle>Create Manager</DialogTitle>
+        <DialogTitle>Create Staff Account</DialogTitle>
 
         <DialogContent>
 

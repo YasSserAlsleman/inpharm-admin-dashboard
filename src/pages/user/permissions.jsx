@@ -63,9 +63,10 @@ export const permissionGroups = [
     ]
   },
   {
-    title: "Other",
+    title: "System Settings",
     permissions: [
-      { key: "addAbout", label: "Edit About Page" }
+      { key: "updateAppSettings", label: "Update App Settings (WhatsApp)" },
+      { key: "changeUserRole", label: "Change User Roles" }
     ]
   }
 ];

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, TextField, Chip, Stack, Button, Dialog, DialogTitle, DialogContent, DialogActions, Alert, Card, CardContent, Typography, Divider, CircularProgress } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import axios from "../../api/axiosClient";
+import { useAuth } from "../../contexts/AuthContext";
 
 const Students = () => {
 
@@ -13,6 +14,7 @@ const Students = () => {
   const [revokeLoading, setRevokeLoading] = useState(false);
   const [revokeReason, setRevokeReason] = useState("");
   const [selectedSubscription, setSelectedSubscription] = useState(null);
+  const { can } = useAuth();
 
   // جلب الطلاب
   const fetchStudents = async () => {
@@ -268,7 +270,7 @@ const Students = () => {
                                 <Typography variant="body2"><strong>الحالة:</strong> <Chip label={sub.status} size="small" color={sub.status === "active" ? "success" : sub.status === "revoked" ? "error" : "warning"} /></Typography>
                                 <Typography variant="body2"><strong>تاريخ التفعيل:</strong> {new Date(sub.activatedAt).toLocaleDateString('ar-SA')}</Typography>
                               </Box>
-                              {sub.status === "active" && (
+                              {sub.status === "active" && can('deleteUser') && (
                                 <Button
                                   variant="contained"
                                   color="error"

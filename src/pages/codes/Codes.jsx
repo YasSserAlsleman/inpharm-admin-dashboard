@@ -7,6 +7,7 @@ import AddIcon from '@mui/icons-material/Add';
 import { useState, useEffect } from "react";
 import axios from '../../api/axiosClient';
 import GenerateCodesModal from '../codes/GenerateCodesModal';
+import { useAuth } from "../../contexts/AuthContext";
 
 const Codes = () => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -20,6 +21,7 @@ const Codes = () => {
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [phoneTempValue, setPhoneTempValue] = useState('');
+  const { can } = useAuth();
   const limit = 10;
 
   const fetchPlans = async () => {
@@ -145,16 +147,18 @@ const   durationM =   (durationDays) => {
                 {whatsappPhone || 'لم يتم تعيين رقم'}
               </Typography>
             </Box>
-            <Button 
-              variant="contained" 
-              color="primary"
-              onClick={() => {
-                setIsEditingPhone(true);
-                setPhoneTempValue(whatsappPhone);
-              }}
-            >
-              تعديل
-            </Button>
+            {can('updateAppSettings') && (
+              <Button 
+                variant="contained" 
+                color="primary"
+                onClick={() => {
+                  setIsEditingPhone(true);
+                  setPhoneTempValue(whatsappPhone);
+                }}
+              >
+                تعديل
+              </Button>
+            )}
           </Box>
         ) : (
           <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>

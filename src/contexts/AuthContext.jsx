@@ -65,8 +65,14 @@ const [loading, setLoading] = useState(true);
     setUser(null);
   };
 
+  const can = (permission) => {
+    if (!user) return false;
+    if (user.role === 'admin') return true;
+    return !!user.permissions?.[permission];
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout, loading, can }}>
       {children}
     </AuthContext.Provider>
   );
