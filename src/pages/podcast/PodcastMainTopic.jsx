@@ -104,8 +104,14 @@ const handleToggleHide = async (topicId, isHidden) => {
   const handleSaveEdit = async (topic) => {
     try {
       const formData = new FormData();
-      formData.append("name", topic.editName);
-      formData.append("description", topic.editDescription);
+      formData.append("name", topic.editNameAr || topic.editNameEn || topic.editNameDe);
+      formData.append("name_ar", topic.editNameAr);
+      formData.append("name_en", topic.editNameEn);
+      formData.append("name_de", topic.editNameDe);
+      formData.append("description", topic.editDescriptionAr || topic.editDescriptionEn || topic.editDescriptionDe);
+      formData.append("description_ar", topic.editDescriptionAr);
+      formData.append("description_en", topic.editDescriptionEn);
+      formData.append("description_de", topic.editDescriptionDe);
       if (topic.editImageFile) formData.append("image", topic.editImageFile);
 
       await axios.put(`/podcastMainTopic/${topic._id}`, formData, {

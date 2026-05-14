@@ -5,6 +5,8 @@ import { getLocalizedValue } from '../../utils/getLocalizedValue'
 import { BASE_FILE_URL } from '../../config/config'
 import { useParams, useNavigate, Link } from "react-router-dom";
 
+import SubNewsCard from "../../components/SubNewsCard";
+
 export default function SubNews() {
   const { newsId } = useParams(); // القسم الذي نعرض أخباره
   const [news, setMainNews] = useState(null);
@@ -76,10 +78,6 @@ export default function SubNews() {
     }
   };
 
-  const getAudioUrl = (url) => {
-    return url?.startsWith("http") ? url : `${BASE_FILE_URL}/uploads/subnews/${url}`;
-  };
-
 
   const handleDelete = async (id) => {
     if (!window.confirm("هل تريد حذف هذا الخبر؟")) return;
@@ -101,6 +99,31 @@ const handleToggleHide = async (subNewsId, isHidden) => {
     console.error("❌ Error toggling hide:", err);
   }
 };
+
+  // ✏️ حفظ التعديلات
+  const handleSaveEdit = async (item) => {
+    try {
+      const formData = new FormData();
+      formData.append("title_ar", item.editTitleAr);
+      formData.append("title_en", item.editTitleEn);
+      formData.append("title_de", item.editTitleDe);
+      formData.append("description_ar", item.editDescriptionAr);
+      formData.append("description_en", item.editDescriptionEn);
+      formData.append("description_de", item.editDescriptionDe);
+
+      if (item.editImageFile) formData.append("image", item.editImageFile);
+      if (item.editAudioArFile) formData.append("audio", item.editAudioArFile);
+      if (item.editAudioEnFile) formData.append("audio_en", item.editAudioEnFile);
+      if (item.editAudioDeFile) formData.append("audio_de", item.editAudioDeFile);
+
+      await axios.put(`/subnews/${item._id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      fetchSubNews();
+    } catch (err) {
+      console.error("❌ Error updating subnews:", err);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -197,74 +220,13 @@ const handleToggleHide = async (subNewsId, isHidden) => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {subNews.map((item) => (
-
-
-            <div key={item._id} className="bg-white p-4 rounded-lg shadow">
-              <h3 className="font-semibold text-lg">
-                {getLocalizedValue(item, 'title', i18n.language)}</h3>
-
-              {getLocalizedValue(item, 'description', i18n.language) ? (
-                <p className="text-gray-600 text-sm mb-3">
-                  {getLocalizedValue(item, 'description', i18n.language).length > 100
-                    ? getLocalizedValue(item, 'description', i18n.language).slice(0, 100) + "…"
-                    : getLocalizedValue(item, 'description', i18n.language)}
-                </p>
-              ) : (
-                <p className="text-gray-400 text-sm mb-3">لا يوجد وصف متاح</p>
-              )}
-              {item.image && (
-                <img
-                  src={`${BASE_FILE_URL}/uploads/subnews/${item.image}`}
-                  alt=""
-                  className="mt-2 rounded"
-                />
-              )}
-              {(item.audio || item.audio_en || item.audio_de) && (
-                <audio controls className="mb-3 w-full">
-                  <source src={getAudioUrl(getLocalizedValue(item, 'audio', i18n.language))} />
-                  المتصفح لا يدعم تشغيل الصوت.
-                </audio>
-
-
-                // <audio controls className="mt-2 w-full">
-                //   <source src={`${BASE_FILE_URL}/uploads/subnews/${item.audio}`} type="audio/mpeg" />
-                // </audio>
-              )}
-
-              <button
-                onClick={() => handleDelete(item._id)}
-                className="mt-4 text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-              >
-                🗑 حذف
-              </button>
-
-
-
-
-            {/* 🔹 إضافة Toggle للإخفاء */}
-            <div className="mt-4 flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">إخفاء من التطبيق الجوال</label>
-              <input
-                type="checkbox"
-                checked={item.isHidden || false}
-                onChange={(e) => handleToggleHide(item._id, e.target.checked)}
-                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-              />
-            </div>
-
-            {/* إشارة بصرية لحالة الإخفاء */}
-            {item.isHidden && (
-              <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                مخفي
-              </div>
-            )}
-
-       
-              
-            </div>
-
-
-
+            <SubNewsCard
+              key={item._id}
+              item={item}
+              handleDelete={handleDelete}
+              handleSaveEdit={handleSaveEdit}
+              handleToggleHide={handleToggleHide}
+            />
           ))}
         </div>
       )}
@@ -274,7 +236,6 @@ const handleToggleHide = async (subNewsId, isHidden) => {
           ← العودة إلى  الأخبار والتنبيهات
         </Link>
       </div>
-
     </div>
   );
 }

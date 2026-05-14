@@ -8,8 +8,12 @@ import { BASE_FILE_URL } from '../config/config';  // أضف هذا في الأ�
 export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, navigate, handleImageChange ,handleToggleHide}) {
   const { i18n, t } = useTranslation();
   const [editMode, setEditMode] = useState(false);
-  const [editName, setEditName] = useState(getLocalizedValue(topic, 'name', i18n.language));
-  const [editDescription, setEditDescription] = useState(getLocalizedValue(topic, 'description', i18n.language) || "");
+  const [editNameAr, setEditNameAr] = useState(topic.name_ar || "");
+  const [editNameEn, setEditNameEn] = useState(topic.name_en || "");
+  const [editNameDe, setEditNameDe] = useState(topic.name_de || "");
+  const [editDescriptionAr, setEditDescriptionAr] = useState(topic.description_ar || "");
+  const [editDescriptionEn, setEditDescriptionEn] = useState(topic.description_en || "");
+  const [editDescriptionDe, setEditDescriptionDe] = useState(topic.description_de || "");
   const [editImageFile, setEditImageFile] = useState(null);
   const [editPreviewImage, setEditPreviewImage] = useState(topic.imageUrl || null);
 
@@ -19,14 +23,50 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
         <div className="p-4 flex flex-col gap-2">
           <input
             className="border rounded px-3 py-2"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
+            placeholder="الاسم (العربية)"
+            value={editNameAr}
+            onChange={(e) => setEditNameAr(e.target.value)}
+          />
+          <input
+            className="border rounded px-3 py-2"
+            placeholder="Name (English)"
+            value={editNameEn}
+            onChange={(e) => setEditNameEn(e.target.value)}
+          />
+          <input
+            className="border rounded px-3 py-2"
+            placeholder="Name (Deutsch)"
+            value={editNameDe}
+            onChange={(e) => setEditNameDe(e.target.value)}
           />
           <textarea
             className="border rounded px-3 py-2 overflow-hidden"
-            value={editDescription}
+            placeholder="الوصف (العربية)"
+            value={editDescriptionAr}
             rows={1}
-            onChange={(e) => setEditDescription(e.target.value)}
+            onChange={(e) => setEditDescriptionAr(e.target.value)}
+            onInput={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
+          />
+          <textarea
+            className="border rounded px-3 py-2 overflow-hidden"
+            placeholder="Description (English)"
+            value={editDescriptionEn}
+            rows={1}
+            onChange={(e) => setEditDescriptionEn(e.target.value)}
+            onInput={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+            }}
+          />
+          <textarea
+            className="border rounded px-3 py-2 overflow-hidden"
+            placeholder="Beschreibung (Deutsch)"
+            value={editDescriptionDe}
+            rows={1}
+            onChange={(e) => setEditDescriptionDe(e.target.value)}
             onInput={(e) => {
               e.target.style.height = "auto";
               e.target.style.height = e.target.scrollHeight + "px";
@@ -48,8 +88,12 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
               onClick={() => {
                 handleSaveEdit({
                   ...topic,
-                  editName,
-                  editDescription,
+                  editNameAr,
+                  editNameEn,
+                  editNameDe,
+                  editDescriptionAr,
+                  editDescriptionEn,
+                  editDescriptionDe,
                   editImageFile,
                 });
                 setEditMode(false);

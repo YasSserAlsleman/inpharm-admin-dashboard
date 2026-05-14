@@ -101,7 +101,7 @@ export default function VirtualPharmacyLessonDetails() {
     const url = lesson[qualityField] || baseField;
       console.log(`🔍 جلب رابط الفيديو: ${BASE_FILE_URL}/uploads${url}`);
     return url?.startsWith("http") ? url : `${BASE_FILE_URL}/uploads${url}`;
-  };
+  }; 
 
   const getPdfUrl = (lesson, field) => {
     const url = getLocalizedValue(lesson, field, i18n.language) || lesson[field];

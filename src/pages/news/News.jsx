@@ -7,6 +7,8 @@ import { getLocalizedValue } from '../../utils/getLocalizedValue'
 import { useNavigate } from "react-router-dom";
 
 
+import NewsCard from "../../components/NewsCard";
+
 export default function News() {
 
     const [news, setNews] = useState([]);
@@ -84,6 +86,23 @@ const handleToggleHide = async (newsId, isHidden) => {
     console.error("❌ Error toggling hide:", err);
   }
 };
+
+  // ✏️ حفظ التعديلات
+  const handleSaveEdit = async (item) => {
+    try {
+      await axios.put(`/news/${item._id}`, {
+        name_ar: item.editNameAr,
+        name_en: item.editNameEn,
+        name_de: item.editNameDe,
+        description_ar: item.editDescriptionAr,
+        description_en: item.editDescriptionEn,
+        description_de: item.editDescriptionDe,
+      });
+      fetchNews();
+    } catch (err) {
+      console.error("❌ Error updating news:", err);
+    }
+  };
 
     return (
         <div className="p-6">
@@ -179,58 +198,17 @@ const handleToggleHide = async (newsId, isHidden) => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {news.map((item) => (
-                        <div key={item._id} className="bg-white p-4 rounded-lg shadow">
-                            <h3 className="font-semibold text-lg text-gray-800">{getLocalizedValue(item, 'name', i18n.language)}</h3>
-                            <p className="text-gray-600 mt-2">{getLocalizedValue(item, 'description', i18n.language)}</p>
-                            <div className="flex gap-2">
-
-                                <button
-                                    className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                                    onClick={() => navigate(`/news/${item._id}/subNews`)}
-                                >
-                                    استكشاف
-                                </button>
-                                <button
-                                    onClick={() => handleDeleteNews(item._id)}
-                                    className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
-                                >
-                                    🗑 حذف
-                                </button>
-                            </div>
-
-
-
-
-            {/* 🔹 إضافة Toggle للإخفاء */}
-            <div className="mt-4 flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">إخفاء من التطبيق الجوال</label>
-              <input
-                type="checkbox"
-                checked={item.isHidden || false}
-                onChange={(e) => handleToggleHide(item._id, e.target.checked)}
-                className="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500"
-              />
-            </div>
-
-            {/* إشارة بصرية لحالة الإخفاء */}
-            {item.isHidden && (
-              <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                مخفي
-              </div>
-            )}
-
-       </div>
-
-
-
+                        <NewsCard
+                            key={item._id}
+                            item={item}
+                            handleDeleteNews={handleDeleteNews}
+                            handleSaveEdit={handleSaveEdit}
+                            navigate={navigate}
+                            handleToggleHide={handleToggleHide}
+                        />
                     ))}
                 </div>
-
             )}
-
-            
         </div>
     );
-
-
 }
