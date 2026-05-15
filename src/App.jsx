@@ -38,11 +38,14 @@ import PodcastLessonComments from "./pages/podcast/PodcastLessonComments";
 import News from "./pages/news/News";
 import SubNews from "./pages/news/SubNews";
 import AboutPage from "./pages/about/AboutPage";
+import NotificationListener from "./components/NotificationListener";
 
 function App() {
   const { isAuthenticated } = useAuth();
 
   return (
+    <>
+    <NotificationListener />
     <Routes>
       {/* 🔹 Login */}
       <Route path="/login" element={<Login />} />
@@ -277,6 +280,7 @@ function App() {
       {/* ---------------- Fallback 404 ---------------- */}
       <Route path="*" element={<NotFound />} />
     </Routes>
+    </>
   );
 }
 

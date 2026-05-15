@@ -57,13 +57,13 @@ export default function PodcastLessonComments() {
         </button>
       </div>
 
-      {comments.map((c) => (
+      {comments.filter(c => !c.isDeleted).map((c) => (
         <div key={c._id} className="border-t pt-3 mt-3">
           <p>
             <strong>{c.userName}:</strong> <LinkableText text={c.text} />
           </p>
           <div className="ml-6 mt-2 space-y-1">
-            {c.replies.map((r, i) => (
+            {c.replies.filter(r => !r.isDeleted).map((r, i) => (
               <p key={i} className="text-gray-600 text-sm">
                 ↳ <strong>{r.userName}:</strong> <LinkableText text={r.text} />
               </p>

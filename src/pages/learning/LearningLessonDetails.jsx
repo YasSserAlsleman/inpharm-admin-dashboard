@@ -8,6 +8,8 @@ import LinkableText from "../../components/LinkableText";
 import RelatedLessonsModal from "../../components/RelatedLessonsModal";
 import LanguageIndicator from "../../components/LanguageIndicator";
 import Swal from "sweetalert2";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function LearningLessonDetails() {
   const { i18n, t } = useTranslation();
@@ -420,33 +422,43 @@ export default function LearningLessonDetails() {
                 />
               </div>
 
-              <textarea
-                placeholder="الوصف (العربية)"
-                className="border rounded p-2 w-full"
-                rows="3"
-                value={editedLesson.description_ar}
-                onChange={(e) =>
-                  setEditedLesson({ ...editedLesson, description_ar: e.target.value })
-                }
-              />
-              <textarea
-                placeholder="Lesson description (English)"
-                className="border rounded p-2 w-full"
-                rows="3"
-                value={editedLesson.description_en}
-                onChange={(e) =>
-                  setEditedLesson({ ...editedLesson, description_en: e.target.value })
-                }
-              />
-              <textarea
-                placeholder="Beschreibung der Lektion (Deutsch)"
-                className="border rounded p-2 w-full"
-                rows="3"
-                value={editedLesson.description_de}
-                onChange={(e) =>
-                  setEditedLesson({ ...editedLesson, description_de: e.target.value })
-                }
-              />
+              <div className="md:col-span-2 space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">الوصف (العربية):</label>
+                  <div className="bg-white">
+                    <ReactQuill
+                      theme="snow"
+                      value={editedLesson.description_ar || ""}
+                      onChange={(val) => setEditedLesson({ ...editedLesson, description_ar: val })}
+                      className="h-40 mb-12"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">Description (English):</label>
+                  <div className="bg-white">
+                    <ReactQuill
+                      theme="snow"
+                      value={editedLesson.description_en || ""}
+                      onChange={(val) => setEditedLesson({ ...editedLesson, description_en: val })}
+                      className="h-40 mb-12"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-1 text-gray-700">Beschreibung (Deutsch):</label>
+                  <div className="bg-white">
+                    <ReactQuill
+                      theme="snow"
+                      value={editedLesson.description_de || ""}
+                      onChange={(val) => setEditedLesson({ ...editedLesson, description_de: val })}
+                      className="h-40 mb-12"
+                    />
+                  </div>
+                </div>
+              </div>
 
               {/* قسم المصادر */}
               <div className="md:col-span-2">
@@ -919,7 +931,7 @@ function CommentItem({ comment, onReply, onDeleteComment }) {
 
       {comment.replies && comment.replies.length > 0 && (
         <div className="ml-6 mt-3 border-l pl-3">
-          {comment.replies.map((r, index) => (
+          {comment.replies.filter(r => !r.isDeleted).map((r, index) => (
             <div key={r._id}>
               <div className="flex justify-between text-sm mb-1">
                 <div>

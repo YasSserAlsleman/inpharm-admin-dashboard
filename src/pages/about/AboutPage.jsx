@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/axiosClient";
 import { BASE_FILE_URL } from '../../config/config';  // أضف هذا في الأعلى
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 export default function AboutPage() {
   const [about, setAbout] = useState({
@@ -378,25 +380,50 @@ export default function AboutPage() {
   );
 }
 
+function RichTextInput({ label, value, onChange, placeholder, height = "h-40" }) {
+  const modules = {
+    toolbar: [
+      [{ 'header': [1, 2, false] }],
+      ['bold', 'italic', 'underline', 'strike'],
+      [{ 'color': [] }, { 'background': [] }],
+      ['clean']
+    ],
+  };
+
+  return (
+    <div className="mb-4">
+      {label && <label className="block text-sm font-semibold mb-1 text-gray-700">{label}</label>}
+      <div className="bg-white">
+        <ReactQuill
+          theme="snow"
+          value={value || ""}
+          onChange={onChange}
+          modules={modules}
+          placeholder={placeholder}
+          className={`${height} mb-12`}
+        />
+      </div>
+    </div>
+  );
+}
+
 function SectionInput({ label, value, onChange }) {
   return (
-    <div>
-      <h3 className="font-semibold mb-2 text-lg text-gray-700">{label}</h3>
-      <textarea
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full border p-3 rounded-lg h-28"
-      />
-    </div>
+    <RichTextInput 
+      label={label}
+      value={value}
+      onChange={onChange}
+      height="h-48"
+    />
   );
 }
 
 function PeopleSection({ label, data, onAdd, onChange, onDelete, onFileChange }) {
   return (
-    <div>
-      <h3 className="font-semibold mb-2 text-lg text-gray-700">{label}</h3>
+    <div className="mb-8">
+      <h3 className="font-semibold mb-4 text-xl text-gray-800 border-b pb-2">{label}</h3>
       {data.map((p, i) => (
-        <div key={i} className="border p-3 mb-3 rounded relative bg-gray-50">
+        <div key={i} className="border p-4 mb-6 rounded-lg relative bg-gray-50 shadow-sm">
           {p.imageUrl && (
             <img
               src={`${BASE_FILE_URL}${p.imageUrl}`}
@@ -430,23 +457,23 @@ function PeopleSection({ label, data, onAdd, onChange, onDelete, onFileChange })
             placeholder="Name (Deutsch)"
             className="border p-2 rounded w-full mb-2"
           />
-          <textarea
+          <RichTextInput
+            label="معلومات (عربية)"
             value={p.info}
-            onChange={(e) => onChange(i, "info", e.target.value)}
-            placeholder="معلومات (عربية)"
-            className="border p-2 rounded w-full mb-2"
+            onChange={(val) => onChange(i, "info", val)}
+            placeholder="أدخل المعلومات هنا..."
           />
-          <textarea
+          <RichTextInput
+            label="Info (English)"
             value={p.info_en || ""}
-            onChange={(e) => onChange(i, "info_en", e.target.value)}
-            placeholder="Info (English)"
-            className="border p-2 rounded w-full mb-2"
+            onChange={(val) => onChange(i, "info_en", val)}
+            placeholder="Enter info here..."
           />
-          <textarea
+          <RichTextInput
+            label="Info (Deutsch)"
             value={p.info_de || ""}
-            onChange={(e) => onChange(i, "info_de", e.target.value)}
-            placeholder="Info (Deutsch)"
-            className="border p-2 rounded w-full mb-2"
+            onChange={(val) => onChange(i, "info_de", val)}
+            placeholder="Info hier eingeben..."
           />
           <input
             type="text"
