@@ -98,6 +98,20 @@ const Managers = () => {
     }
   };
 
+  // حذف المدير
+  const handleDeleteManager = async (id) => {
+    if (id === currentUser?.id) return alert("لا يمكنك حذف حسابك الخاص من هنا");
+    if (!window.confirm("هل أنت متأكد من حذف هذا الحساب نهائياً؟")) return;
+    try {
+      await axios.delete(`/admin/users/${id}`);
+      alert("✅ تم حذف الحساب بنجاح");
+      fetchManagers();
+    } catch (err) {
+      console.error("خطأ في حذف الحساب:", err);
+      alert("❌ فشل في حذف الحساب");
+    }
+  };
+
   // إنشاء أعمدة DataGrid من الصلاحيات
   const permissionColumns = permissionGroups.flatMap(group =>
     group.permissions.map(p => ({
@@ -142,13 +156,22 @@ const Managers = () => {
     },
     ...permissionColumns,
     {
-      field: "createdAt",
-      headerName: "Created At",
-      width: 150,
-      valueGetter: (params) => {
-        const date = params?.row?.createdAt;
-        return date ? new Date(date).toLocaleDateString() : "-";
-      }
+      field: "actions",
+      headerName: "Actions",
+      width: 120,
+      sortable: false,
+      renderCell: (params) => (
+        can('deleteUser') && params.row._id !== currentUser?.id && (
+          <Button
+            variant="contained"
+            color="error"
+            size="small"
+            onClick={() => handleDeleteManager(params.row._id)}
+          >
+            🗑️ حذف
+          </Button>
+        )
+      )
     }
   ];
 

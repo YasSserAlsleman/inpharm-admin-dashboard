@@ -89,6 +89,19 @@ const Students = () => {
     }
   };
 
+  // حذف المستخدم
+  const handleDeleteUser = async (id) => {
+    if (!window.confirm("هل أنت متأكد من حذف هذا المستخدم نهائياً؟")) return;
+    try {
+      await axios.delete(`/admin/users/${id}`);
+      alert("✅ تم حذف المستخدم بنجاح");
+      fetchStudents();
+    } catch (err) {
+      console.error("خطأ في حذف المستخدم:", err);
+      alert("❌ فشل في حذف المستخدم");
+    }
+  };
+
   // تحديد لون الاشتراك
   const getSubscriptionColor = (expireDate, status) => {
     
@@ -189,16 +202,28 @@ const Students = () => {
     {
       field: "actions",
       headerName: "Actions",
-      flex: 1,
+      flex: 1.5,
       sortable: false,
       renderCell: (params) => (
-        <Button
-          variant="contained"
-          size="small"
-          onClick={() => handleOpenModal(params.row)}
-        >
-          👁️ عرض التفاصيل
-        </Button>
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => handleOpenModal(params.row)}
+          >
+            👁️ التفاصيل
+          </Button>
+          {can('deleteUser') && (
+            <Button
+              variant="contained"
+              color="error"
+              size="small"
+              onClick={() => handleDeleteUser(params.row._id)}
+            >
+              🗑️ حذف
+            </Button>
+          )}
+        </Stack>
       )
     }
 
