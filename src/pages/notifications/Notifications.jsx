@@ -1,8 +1,6 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "../../api/axiosClient";
-import { format } from "date-fns";
-import { ar } from "date-fns/locale";
 import { 
   Notifications as NotificationsIcon, 
   Comment as CommentIcon, 
@@ -88,7 +86,13 @@ export default function Notifications() {
                     {n.title}
                   </h3>
                   <span className="text-xs text-gray-400">
-                    {format(new Date(n.createdAt), 'yyyy/MM/dd HH:mm', { locale: ar })}
+                    {new Date(n.createdAt).toLocaleString('ar-EG', { 
+                      year: 'numeric', 
+                      month: '2-digit', 
+                      day: '2-digit', 
+                      hour: '2-digit', 
+                      minute: '2-digit' 
+                    })}
                   </span>
                 </div>
                 <p className="text-sm text-gray-600 mt-1">{n.body}</p>
