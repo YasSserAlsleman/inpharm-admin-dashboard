@@ -74,6 +74,7 @@ import { useTranslation } from 'react-i18next'
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/Students">{t('navigation.students')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/Managers">{t('navigation.managers')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/change-password">{t('navigation.changePassword')}</Link>
+            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/notifications">{t('navigation.notifications')}</Link>
 
 
           </nav>

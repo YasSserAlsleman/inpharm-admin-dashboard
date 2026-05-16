@@ -18,7 +18,8 @@ const resources = {
         plans: 'Plans',
         students: 'Students',
         managers: 'Managers',
-        changePassword: 'Change Password'
+        changePassword: 'Change Password',
+        notifications: 'Notifications'
       },
       button: {
         logout: 'Logout',
@@ -127,7 +128,8 @@ const resources = {
         codes: 'الرموز',
         plans: 'الخطط',
         students: 'الطلاب',
-        managers: 'المدراء'
+        managers: 'المدراء',
+        notifications: 'الإشعارات'
       },
       button: {
         logout: 'تسجيل الخروج',
@@ -235,7 +237,8 @@ const resources = {
         codes: 'Codes',
         plans: 'Pläne',
         students: 'Studenten',
-        managers: 'Manager'
+        managers: 'Manager',
+        notifications: 'Benachrichtigungen'
       },
       button: {
         logout: 'Abmelden',

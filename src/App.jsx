@@ -38,6 +38,7 @@ import PodcastLessonComments from "./pages/podcast/PodcastLessonComments";
 import News from "./pages/news/News";
 import SubNews from "./pages/news/SubNews";
 import AboutPage from "./pages/about/AboutPage";
+import Notifications from "./pages/notifications/Notifications";
 import NotificationListener from "./components/NotificationListener";
 
 function App() {
@@ -265,6 +266,14 @@ function App() {
         element={
           <PrivateRoute roles={['admin','manager']}>
             <AdminLayout><SubNews /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><Notifications /></AdminLayout>
           </PrivateRoute>
         }
       />
