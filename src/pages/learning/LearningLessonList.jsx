@@ -163,9 +163,6 @@ const handleToggleHide = async (lessonId, isHidden) => {
         }
       });
 
-      const res = await axios.post('/learningLesson/add', formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
      
 
       const res = await axios.post('/learningLesson/add', formData, {
