@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { Snackbar, Alert } from "@mui/material"
 import { useTranslation } from 'react-i18next'
+import axios from '../api/axiosClient'
 
   export default function AdminLayout({ children }) {
     const navigate = useNavigate()
@@ -25,7 +26,17 @@ import { useTranslation } from 'react-i18next'
     severity:"error"
   })
 
+  const [unreadCount, setUnreadCount] = useState(0)
+
   useEffect(()=>{
+    axios.get("/notifications").then(res => {
+      setUnreadCount(res.data.filter(n => !n.isRead).length);
+    }).catch(err => console.error("Error fetching notifications for badge", err));
+
+    const newNotificationHandler = () => {
+      setUnreadCount(prev => prev + 1);
+    };
+    window.addEventListener("new-notification-local", newNotificationHandler);
 
     const handler = (e)=>{
       setNotification({
@@ -37,7 +48,10 @@ import { useTranslation } from 'react-i18next'
 
     window.addEventListener("api-error",handler)
 
-    return ()=> window.removeEventListener("api-error",handler)
+    return ()=> {
+      window.removeEventListener("api-error",handler)
+      window.removeEventListener("new-notification-local", newNotificationHandler)
+    }
 
   },[])
 
@@ -74,7 +88,14 @@ import { useTranslation } from 'react-i18next'
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/Students">{t('navigation.students')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/Managers">{t('navigation.managers')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/change-password">{t('navigation.changePassword')}</Link>
-            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/notifications">{t('navigation.notifications')}</Link>
+            <Link className="block py-2 px-3 rounded hover:bg-primary/80 flex items-center justify-between" to="/notifications">
+              <span>{t('navigation.notifications')}</span>
+              {unreadCount > 0 && (
+                <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  {unreadCount}
+                </span>
+              )}
+            </Link>
 
 
           </nav>

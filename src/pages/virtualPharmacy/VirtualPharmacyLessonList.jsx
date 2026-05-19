@@ -28,8 +28,8 @@ export default function VirtualPharmacyLessonList() {
     pdfFileUpload_en: null,
     pdfFileUpload_de: null,
     description_ar: "",
-    description_en: "",
     description_de: "",
+    isFree: false,
     sources: [{ title: "", link: "" }],
   });
 
@@ -139,6 +139,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
       formData.append("description_ar", newLesson.description_ar);
       formData.append("description_en", newLesson.description_en);
       formData.append("description_de", newLesson.description_de);
+      formData.append("isFree", newLesson.isFree);
       formData.append("video_ar", newLesson.videoFile_ar);
       if (newLesson.videoFile_en) formData.append("video_en", newLesson.videoFile_en);
       if (newLesson.videoFile_de) formData.append("video_de", newLesson.videoFile_de);
@@ -172,6 +173,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
         videoFile_ar: null,
         videoFile_en: null,
         videoFile_de: null,
+        isFree: false,
         sources: [{ title: "", link: "" }],
       });
       fetchLectureAndLessons();
@@ -284,6 +286,19 @@ const handleToggleHide = async (lessonId, isHidden) => {
           value={newLesson.description_de}
           onChange={(e) => setNewLesson({ ...newLesson, description_de: e.target.value })}
         />
+
+        <div className="md:col-span-2 flex items-center gap-2 mt-2">
+          <input
+            type="checkbox"
+            id="isFreeCheckbox"
+            checked={newLesson.isFree}
+            onChange={(e) => setNewLesson({ ...newLesson, isFree: e.target.checked })}
+            className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label htmlFor="isFreeCheckbox" className="text-gray-700 font-semibold cursor-pointer">
+            مجاني (Free Lesson)
+          </label>
+        </div>
 
         <div className="md:col-span-2">
           <label className="block text-sm font-medium text-gray-700 mb-1">Video file (العربية)</label>

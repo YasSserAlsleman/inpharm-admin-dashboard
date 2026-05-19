@@ -43,6 +43,7 @@ export default function VirtualPharmacyLessonDetails() {
     pdfFileUpload_en: null,
     pdfFileUpload_de: null,
     videoPreview: null,
+    isFree: false,
     sources: [{ title: "", link: "" }],
   });
 
@@ -78,6 +79,7 @@ export default function VirtualPharmacyLessonDetails() {
         pdfFileUpload_en: null,
         pdfFileUpload_de: null,
         videoPreview: null,
+        isFree: res.data.isFree || false,
         sources: res.data.sources || [{ title: "", link: "" }],
       });
     } catch (err) {
@@ -170,6 +172,7 @@ export default function VirtualPharmacyLessonDetails() {
       formData.append("description_ar", editedLesson.description_ar);
       formData.append("description_en", editedLesson.description_en);
       formData.append("description_de", editedLesson.description_de);
+      formData.append("isFree", editedLesson.isFree);
 
       if (editedLesson.videoFile_ar) {
         formData.append("video_ar", editedLesson.videoFile_ar);
@@ -334,6 +337,19 @@ export default function VirtualPharmacyLessonDetails() {
                   setEditedLesson({ ...editedLesson, name_de: e.target.value })
                 }
               />
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isFreeEditCheckbox"
+                  checked={editedLesson.isFree}
+                  onChange={(e) => setEditedLesson({ ...editedLesson, isFree: e.target.checked })}
+                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                />
+                <label htmlFor="isFreeEditCheckbox" className="text-gray-700 font-semibold cursor-pointer">
+                  مجاني (Free Lesson)
+                </label>
+              </div>
 
               {/* رفع الفيديو */}
               <div>

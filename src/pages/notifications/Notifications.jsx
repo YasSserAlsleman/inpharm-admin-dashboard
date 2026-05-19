@@ -1,6 +1,6 @@
-
 import React, { useEffect, useState } from "react";
 import axios from "../../api/axiosClient";
+import { useNavigate } from "react-router-dom";
 import { 
   Notifications as NotificationsIcon, 
   Comment as CommentIcon, 
@@ -12,6 +12,7 @@ import {
 export default function Notifications() {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchNotifications = async () => {
     try {
@@ -47,6 +48,28 @@ export default function Notifications() {
     }
   };
 
+  const handleNotificationClick = (n) => {
+    if (!n.isRead) {
+      markAsRead(n._id);
+    }
+    
+    // Navigate based on type
+    if (n.type === 'admin_new_comment' || n.type === 'reply') {
+      if (n.data?.lessonId) {
+        navigate(`/learningLesson/${n.data.lessonId}/comments`);
+      }
+    } else if (n.type === 'admin_report') {
+      if (n.data?.lessonId) {
+        navigate(`/learningLesson/${n.data.lessonId}/comments`);
+      } else {
+        // If lessonId not in data, could be a comment report without lessonId in data
+        // For now, no specific route if we only have commentId
+      }
+    } else if (n.type === 'news') {
+      navigate('/news');
+    }
+  };
+
   return (
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
@@ -74,7 +97,7 @@ export default function Notifications() {
           {notifications.map((n) => (
             <div 
               key={n._id}
-              onClick={() => !n.isRead && markAsRead(n._id)}
+              onClick={() => handleNotificationClick(n)}
               className={`p-4 border-b last:border-0 flex gap-4 items-start hover:bg-gray-50 cursor-pointer transition ${!n.isRead ? 'bg-blue-50/50' : ''}`}
             >
               <div className="mt-1">
