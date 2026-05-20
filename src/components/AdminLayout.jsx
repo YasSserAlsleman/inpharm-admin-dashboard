@@ -29,14 +29,24 @@ import axios from '../api/axiosClient'
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(()=>{
-    axios.get("/notifications").then(res => {
-      setUnreadCount(res.data.filter(n => !n.isRead).length);
-    }).catch(err => console.error("Error fetching notifications for badge", err));
-
-    const newNotificationHandler = () => {
-      setUnreadCount(prev => prev + 1);
+    const refreshUnreadCount = async () => {
+      try {
+        const res = await axios.get("/notifications/unread-count");
+        setUnreadCount(res.data.unreadCount || 0);
+      } catch (err) {
+        console.error("Error fetching unread notification count", err);
+      }
     };
-    window.addEventListener("new-notification-local", newNotificationHandler);
+
+    refreshUnreadCount();
+
+    const handleNotificationsUpdated = () => {
+      refreshUnreadCount();
+    };
+
+    window.addEventListener("new-notification-local", handleNotificationsUpdated);
+    window.addEventListener("notifications-updated", handleNotificationsUpdated);
+    window.addEventListener("focus", handleNotificationsUpdated);
 
     const handler = (e)=>{
       setNotification({
@@ -50,7 +60,9 @@ import axios from '../api/axiosClient'
 
     return ()=> {
       window.removeEventListener("api-error",handler)
-      window.removeEventListener("new-notification-local", newNotificationHandler)
+      window.removeEventListener("new-notification-local", handleNotificationsUpdated)
+      window.removeEventListener("notifications-updated", handleNotificationsUpdated)
+      window.removeEventListener("focus", handleNotificationsUpdated)
     }
 
   },[])

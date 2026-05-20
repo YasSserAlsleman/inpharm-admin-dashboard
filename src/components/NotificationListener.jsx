@@ -16,6 +16,7 @@ const NotificationListener = () => {
       socket.on('new-notification', (data) => {
         console.log("🔔 New Admin Notification:", data);
         
+        window.dispatchEvent(new Event('notifications-updated'));
         window.dispatchEvent(new CustomEvent('new-notification-local', { detail: data }));
 
         // إظهار تنبيه مرئي (Toast)

@@ -43,6 +43,7 @@ export default function Notifications() {
     try {
       await axios.patch(`/notifications/${id}/read`, {});
       setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
+      window.dispatchEvent(new Event('notifications-updated'));
     } catch (err) {
       console.error("❌ Error marking as read:", err);
     }
