@@ -30,6 +30,7 @@ export default function VirtualPharmacyLessonList() {
     description_ar: "",
     description_de: "",
     isFree: false,
+    notifyOnCreate: false,
     sources: [{ title: "", link: "" }],
   });
 
@@ -146,6 +147,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
       if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);
       if (newLesson.pdfFileUpload_en) formData.append("pdfFile_en", newLesson.pdfFileUpload_en);
       if (newLesson.pdfFileUpload_de) formData.append("pdfFile_de", newLesson.pdfFileUpload_de);
+formData.append("notifyOnCreate", newLesson.notifyOnCreate);
 
       // إضافة المصادر
       newLesson.sources.forEach((source, index) => {
@@ -174,6 +176,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
         videoFile_en: null,
         videoFile_de: null,
         isFree: false,
+        notifyOnCreate: false,
         sources: [{ title: "", link: "" }],
       });
       fetchLectureAndLessons();
@@ -297,6 +300,19 @@ const handleToggleHide = async (lessonId, isHidden) => {
           />
           <label htmlFor="isFreeCheckbox" className="text-gray-700 font-semibold cursor-pointer">
             مجاني (Free Lesson)
+          </label>
+        </div>
+        {/* Notify on create checkbox */}
+        <div className="md:col-span-2 flex items-center gap-2 mt-2">
+          <input
+            type="checkbox"
+            id="notifyOnCreateCheckboxVP"
+            checked={newLesson.notifyOnCreate}
+            onChange={(e) => setNewLesson({ ...newLesson, notifyOnCreate: e.target.checked })}
+            className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label htmlFor="notifyOnCreateCheckboxVP" className="text-gray-700 font-semibold cursor-pointer">
+            إرسال إشعار للجميع عند الإنشاء
           </label>
         </div>
 

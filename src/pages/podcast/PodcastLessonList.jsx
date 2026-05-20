@@ -34,6 +34,7 @@ const[loading, setLoading] = useState(true);
     description_en: "",
     description_de: "",
     sources: [{ title: "", link: "" }],
+    notifyOnCreate: false,
   });
 
   // دوال إدارة المصادر
@@ -121,6 +122,7 @@ const[loading, setLoading] = useState(true);
       if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);
       if (newLesson.pdfFileUpload_en) formData.append("pdfFile_en", newLesson.pdfFileUpload_en);
       if (newLesson.pdfFileUpload_de) formData.append("pdfFile_de", newLesson.pdfFileUpload_de);
+      formData.append("notifyOnCreate", newLesson.notifyOnCreate);
 
       // إضافة المصادر
       newLesson.sources.forEach((source, index) => {
@@ -136,7 +138,7 @@ const[loading, setLoading] = useState(true);
 
       const { lessonId, status } = res.data;
 
-      setNewLesson({ name_ar: "", name_en: "", name_de: "", pdfFileUpload_ar: null, pdfFileUpload_en: null, pdfFileUpload_de: null, description_ar: "", description_en: "", description_de: "", audioFile_ar: null, audioFile_en: null, audioFile_de: null, sources: [{ title: "", link: "" }] });
+      setNewLesson({ name_ar: "", name_en: "", name_de: "", pdfFileUpload_ar: null, pdfFileUpload_en: null, pdfFileUpload_de: null, description_ar: "", description_en: "", description_de: "", audioFile_ar: null, audioFile_en: null, audioFile_de: null, notifyOnCreate: false, sources: [{ title: "", link: "" }] });
       fetchLectureAndLessons();
 
       Swal.fire("✅ تم الحفظ!", "تمت إضافة الدرس بنجاح.", "success");
@@ -301,8 +303,22 @@ const[loading, setLoading] = useState(true);
           />
         </div>
 
+        {/* Notify on create checkbox */}
+        <div className="md:col-span-2 flex items-center gap-2 mt-2">
+          <input
+            type="checkbox"
+            id="notifyOnCreateCheckboxPodcast"
+            checked={newLesson.notifyOnCreate}
+            onChange={(e) => setNewLesson({ ...newLesson, notifyOnCreate: e.target.checked })}
+            className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+          />
+          <label htmlFor="notifyOnCreateCheckboxPodcast" className="text-gray-700 font-semibold cursor-pointer">
+            إرسال إشعار للجميع عند الإنشاء
+          </label>
+        </div>
+
         {/* قسم المصادر */}
-        <div className="md:col-span-2">
+        <div className="md:col-span-2 mt-4">
           <div className="flex justify-between items-center mb-2">
             <label className="block text-sm font-medium text-gray-700">المصادر (Sources)</label>
             <button

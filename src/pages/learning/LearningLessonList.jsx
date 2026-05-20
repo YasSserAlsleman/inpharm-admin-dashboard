@@ -36,6 +36,7 @@ export default function LearningLessonList() {
     description_en: "",
     description_de: "",
     isFree: false,
+    notifyOnCreate: false,
     sources: [{ title: "", link: "" }],
   });
 
@@ -155,7 +156,8 @@ const handleToggleHide = async (lessonId, isHidden) => {
       if (newLesson.pdfFileUpload_en) formData.append("pdfFile_en", newLesson.pdfFileUpload_en);
       if (newLesson.pdfFileUpload_de) formData.append("pdfFile_de", newLesson.pdfFileUpload_de);
 
-      // إضافة المصادر
+            formData.append("notifyOnCreate", newLesson.notifyOnCreate);
+
       newLesson.sources.forEach((source, index) => {
         if (source.title.trim() && source.link.trim()) {
           formData.append(`sources[${index}][title]`, source.title);
@@ -172,7 +174,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
       const { lessonId, status } = res.data;
 
       // إعادة تعيين الفورم
-      setNewLesson({ name_ar: "", name_en: "", name_de: "", description_ar: "", description_en: "", description_de: "", isFree: false, videoFile_ar: null, videoFile_en: null, videoFile_de: null, pdfFileUpload_ar: null, pdfFileUpload_en: null, pdfFileUpload_de: null, sources: [{ title: "", link: "" }] });
+      setNewLesson({ name_ar: "", name_en: "", name_de: "", description_ar: "", description_en: "", description_de: "", isFree: false, notifyOnCreate: false, videoFile_ar: null, videoFile_en: null, videoFile_de: null, pdfFileUpload_ar: null, pdfFileUpload_en: null, pdfFileUpload_de: null, sources: [{ title: "", link: "" }] });
         fetchLectureAndLessons();
 
       if (status === "processing") {
@@ -296,6 +298,17 @@ const handleToggleHide = async (lessonId, isHidden) => {
           />
           <label htmlFor="isFreeCheckbox" className="text-gray-700 font-semibold cursor-pointer">
             مجاني (Free Lesson)
+          </label>
+          {/* Notify on create checkbox */}
+          <input
+            type="checkbox"
+            id="notifyOnCreateCheckbox"
+            checked={newLesson.notifyOnCreate}
+            onChange={(e) => setNewLesson({ ...newLesson, notifyOnCreate: e.target.checked })}
+            className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 ml-4"
+          />
+          <label htmlFor="notifyOnCreateCheckbox" className="text-gray-700 font-semibold cursor-pointer ml-2">
+            إرسال إشعار للجميع عند الإنشاء
           </label>
         </div>
 
