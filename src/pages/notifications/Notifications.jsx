@@ -54,16 +54,16 @@ export default function Notifications() {
     }
     
     // Navigate based on type
-    if (n.type === 'admin_new_comment' || n.type === 'reply') {
+    if (n.type === 'admin_new_comment' || n.type === 'reply' || n.type === 'admin_report') {
       if (n.data?.lessonId) {
-        navigate(`/learningLesson/${n.data.lessonId}/comments`);
-      }
-    } else if (n.type === 'admin_report') {
-      if (n.data?.lessonId) {
-        navigate(`/learningLesson/${n.data.lessonId}/comments`);
-      } else {
-        // If lessonId not in data, could be a comment report without lessonId in data
-        // For now, no specific route if we only have commentId
+        const lessonType = n.data.lessonType;
+        if (lessonType === 'virtualPharmacy') {
+          navigate(`/virtualPharmacyLesson/${n.data.lessonId}/comments`);
+        } else if (lessonType === 'podcast') {
+          navigate(`/podcastLesson/${n.data.lessonId}/comments`);
+        } else {
+          navigate(`/learningLesson/${n.data.lessonId}/comments`);
+        }
       }
     } else if (n.type === 'news') {
       navigate('/news');
