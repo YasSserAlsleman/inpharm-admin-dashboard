@@ -58,11 +58,11 @@ export default function Notifications() {
       if (n.data?.lessonId) {
         const lessonType = n.data.lessonType;
         if (lessonType === 'virtualPharmacy') {
-          navigate(`/virtualPharmacyLesson/${n.data.lessonId}/comments`);
+          navigate(`/virtualPharmacyLesson/${n.data.lessonId}/details`);
         } else if (lessonType === 'podcast') {
-          navigate(`/podcastLesson/${n.data.lessonId}/comments`);
+          navigate(`/podcastLesson/${n.data.lessonId}/details`);
         } else {
-          navigate(`/learningLesson/${n.data.lessonId}/comments`);
+          navigate(`/learningLesson/${n.data.lessonId}/details`);
         }
       }
     } else if (n.type === 'news') {
