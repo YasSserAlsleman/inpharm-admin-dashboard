@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from "react-router-dom";
 import axios from "../../api/axiosClient";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../../utils/getLocalizedValue';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function LearningResearchList() {
   const { mainId } = useParams();
@@ -15,6 +16,11 @@ export default function LearningResearchList() {
   const [newResearchEn, setNewResearchEn] = useState("");
   const [newResearchDe, setNewResearchDe] = useState("");
   const [loading, setLoading] = useState(true);
+  const [editingResearchId, setEditingResearchId] = useState(null);
+  const [editedResearchAr, setEditedResearchAr] = useState("");
+  const [editedResearchEn, setEditedResearchEn] = useState("");
+  const [editedResearchDe, setEditedResearchDe] = useState("");
+  const { can } = useAuth();
 
   // 🧭 تحميل المحور الرئيسي + الأبحاث التابعة
   useEffect(() => {
@@ -54,6 +60,36 @@ export default function LearningResearchList() {
       fetchMainAndResearches();
     } catch (err) {
       console.error("❌ خطأ أثناء إضافة البحث:", err);
+    }
+  };
+
+  const handleEditResearch = (research) => {
+    setEditingResearchId(research._id);
+    setEditedResearchAr(research.name || "");
+    setEditedResearchEn(research.name_en || "");
+    setEditedResearchDe(research.name_de || "");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingResearchId(null);
+    setEditedResearchAr("");
+    setEditedResearchEn("");
+    setEditedResearchDe("");
+  };
+
+  const handleUpdateResearch = async (id) => {
+    if (!editedResearchEn.trim()) return alert("أدخل اسم البحث بالإنجليزية على الأقل!");
+    try {
+      await axios.put(`/learningResearch/${id}`, {
+        name: editedResearchAr,
+        name_en: editedResearchEn,
+        name_de: editedResearchDe,
+        mainId
+      });
+      handleCancelEdit();
+      fetchMainAndResearches();
+    } catch (err) {
+      console.error("❌ خطأ أثناء تعديل البحث:", err);
     }
   };
 
@@ -123,6 +159,7 @@ const handleToggleHide = async (researchId, isHidden) => {
         <button
           className="bg-primary text-white px-4 py-2 rounded"
           onClick={handleAddResearch}
+          disabled={!can('addResearch')}
         >
           + إضافة
         </button>
@@ -142,7 +179,8 @@ const handleToggleHide = async (researchId, isHidden) => {
           </thead>
           <tbody>
             {researches.map((r, index) => (
-              <tr key={r._id} className="border-t hover:bg-gray-50">
+              <React.Fragment key={r._id}>
+              <tr className="border-t hover:bg-gray-50">
                 <td className="p-2">{index + 1}</td>
                 <td className="p-2">{getLocalizedValue(r, 'name', i18n.language)}</td>
                 <td className="p-2 text-center">
@@ -160,13 +198,41 @@ const handleToggleHide = async (researchId, isHidden) => {
                       عرض المحاضرات
                     </button>
 
+                    {can('updateResearch') && (
+                      editingResearchId === r._id ? (
+                        <>
+                          <button
+                            onClick={() => handleUpdateResearch(r._id)}
+                            className="bg-green-500 text-white px-3 py-1 rounded"
+                          >
+                            حفظ
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="bg-gray-400 text-white px-3 py-1 rounded"
+                          >
+                            إلغاء
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          onClick={() => handleEditResearch(r)}
+                          className="bg-yellow-500 text-white px-3 py-1 rounded"
+                        >
+                          تعديل
+                        </button>
+                      )
+                    )}
+
                     {/* 🗑 حذف */}
-                    <button
-                      onClick={() => handleDeleteResearch(r._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded"
-                    >
-                      حذف
-                    </button>
+                    {can('deleteResearch') && (
+                      <button
+                        onClick={() => handleDeleteResearch(r._id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        حذف
+                      </button>
+                    )}
                   </div>
                    {/* إضافة Toggle */}
       <div className="mt-4">
@@ -174,11 +240,42 @@ const handleToggleHide = async (researchId, isHidden) => {
         <input
           type="checkbox"
           checked={r.isHidden}
-          onChange={(e) => handleToggleHide(r._id, e.target.checked)}
+          onChange={(e) => can('updateResearch') && handleToggleHide(r._id, e.target.checked)}
+          disabled={!can('updateResearch')}
         />
       </div>
                 </td>
               </tr>
+              {editingResearchId === r._id && (
+                <tr className="border-t bg-gray-50">
+                  <td colSpan={3} className="p-4">
+                    <div className="grid gap-3 md:grid-cols-3">
+                      <input
+                        type="text"
+                        placeholder="اسم البحث بالعربية"
+                        className="border rounded p-2"
+                        value={editedResearchAr}
+                        onChange={(e) => setEditedResearchAr(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Research name in English"
+                        className="border rounded p-2"
+                        value={editedResearchEn}
+                        onChange={(e) => setEditedResearchEn(e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Forschungsname auf Deutsch"
+                        className="border rounded p-2"
+                        value={editedResearchDe}
+                        onChange={(e) => setEditedResearchDe(e.target.value)}
+                      />
+                    </div>
+                  </td>
+                </tr>
+              )}
+              </React.Fragment>
             ))}
           </tbody>
         </table>

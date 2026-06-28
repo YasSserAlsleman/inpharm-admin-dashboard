@@ -77,38 +77,49 @@ const Codes = () => {
   }, [filterPlan, filterStatus, page]);
 
 
-const exportCodes = () => {
-
-  if (!codes.length) return;
-
-  const headers = ["Code","Plan","Duration","UsedBy","Status"];
-
-  const rows = codes.map(c => [
-    c.code,
-  ]);
-
-  const csvContent =
-    [headers, ...rows]
-      .map(e => e.join(","))
-      .join("\n");
-
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
-  // اسم الملف
-  const accessType = codes[0]?.planId?.accessType || "plan";
-  const duration = codes[0]?.planId?.duration || "duration";
-
-  const fileName = `${accessType}_${duration}_months.csv`;
-
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = fileName;
-  link.click();
+const formatCsvValue = (value) => {
+  const stringValue = value == null ? '' : String(value);
+  if (/[",\n]/.test(stringValue)) {
+    return `"${stringValue.replace(/"/g, '""')}"`;
+  }
+  return stringValue;
 };
 
-const   durationM =   (durationDays) => {
+const exportCodes = () => {
+  if (!codes.length) return;
+
+  const headers = ["Code", "Plan", "Duration", "UsedBy", "Status"];
+
+  const rows = codes.map((c) => [
+    formatCsvValue(c.code || ''),
+    formatCsvValue(c.planId?.accessType || c.accessType || 'Unknown'),
+    formatCsvValue(durationM(c.planId?.durationDays || c.durationDays)),
+    formatCsvValue(c.usedBy?.name || c.usedBy || '-'),
+    formatCsvValue(c.isUsed ? 'Used' : 'Unused'),
+  ]);
+ 
+  const delimiter = ';';
+  const csvContent = '\uFEFF' + [headers, ...rows]
+    .map((row) => row.map((cell) => formatCsvValue(cell)).join(delimiter))
+    .join('\r\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+  const accessType = codes[0]?.planId?.accessType || codes[0]?.accessType || 'plan';
+  const duration = codes[0]?.planId?.durationDays || codes[0]?.durationDays || 'all';
+  const fileName = `${accessType}_${duration}_codes.csv`;
+
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+};
+
+const durationM = (durationDays) => {
 
    if(durationDays==30) return "1 Month" 
     else if (durationDays==90) return "3 Months" 
@@ -201,8 +212,14 @@ const   durationM =   (durationDays) => {
           <MenuItem value="unused">غير مستخدم</MenuItem>
         </TextField>
       </Box>
-  <Button variant="contained" color="primary" onClick={exportCodes} sx={{ mr: 2 }}>
-      تصدير CSV
+  <Button
+      variant="contained"
+      color="primary"
+      onClick={exportCodes}
+      disabled={!codes.length}
+      sx={{ mr: 2 }}
+    >
+      تحميل ملف الأكواد (CSV)
     </Button>
 
 

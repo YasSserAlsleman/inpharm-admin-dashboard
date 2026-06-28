@@ -20,6 +20,7 @@ export const permissionGroups = [
     title: "Research",
     permissions: [
       { key: "addResearch", label: "Add Research" },
+      { key: "updateResearch", label: "Update Research" },
       { key: "deleteResearch", label: "Delete Research" }
     ]
   },
@@ -27,6 +28,7 @@ export const permissionGroups = [
     title: "Lectures",
     permissions: [
       { key: "addLecture", label: "Add Lecture" },
+      { key: "updateLecture", label: "Update Lecture" },
       { key: "deleteLecture", label: "Delete Lecture" }
     ]
   },
@@ -34,6 +36,7 @@ export const permissionGroups = [
     title: "Questions",
     permissions: [
       { key: "addQuestion", label: "Add Question" },
+      { key: "updateQuestion", label: "Update Question" },
       { key: "deleteQuestion", label: "Delete Question" }
     ]
   },
@@ -41,8 +44,10 @@ export const permissionGroups = [
     title: "News",
     permissions: [
       { key: "addNews", label: "Add News" },
+      { key: "updateNews", label: "Update News" },
       { key: "deleteNews", label: "Delete News" },
       { key: "addSubNews", label: "Add Sub News" },
+      { key: "updateSubNews", label: "Update Sub News" },
       { key: "deleteSubNews", label: "Delete Sub News" }
     ]
   },
@@ -51,6 +56,7 @@ export const permissionGroups = [
     permissions: [
       { key: "generateCodes", label: "Generate Codes" },
       { key: "generatePlans", label: "Add Plans" },
+      { key: "updatePlans", label: "Update Plans" },
       { key: "deletePlans", label: "Delete Plans" }
     ]
   },
@@ -58,8 +64,15 @@ export const permissionGroups = [
     title: "Users",
     permissions: [
       { key: "deleteUser", label: "Delete User" },
+      { key: "deleteManager", label: "Delete Manager" },
       { key: "createManager", label: "Create Manager" },
       { key: "updateManagerPermissions", label: "Update Manager Permissions" }
+    ]
+  },
+  {
+    title: "Comments",
+    permissions: [
+      { key: "deleteComment", label: "Delete Comment" }
     ]
   },
   {

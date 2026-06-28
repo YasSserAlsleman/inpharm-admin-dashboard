@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import axios from "../../api/axiosClient";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../../utils/getLocalizedValue';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function LearningLectureList() {
   const { researchId } = useParams();
@@ -20,6 +21,15 @@ export default function LearningLectureList() {
   const [previewImage, setPreviewImage] = useState(null);
 
   const [loading, setLoading] = useState(true);
+  const { can } = useAuth();
+
+  // تحرير محاضرة
+  const [editingLectureId, setEditingLectureId] = useState(null);
+  const [editNameAr, setEditNameAr] = useState("");
+  const [editNameEn, setEditNameEn] = useState("");
+  const [editNameDe, setEditNameDe] = useState("");
+  const [editImage, setEditImage] = useState(null);
+  const [editPreviewImage, setEditPreviewImage] = useState(null);
 
   useEffect(() => {
     if (!researchId) return;
@@ -61,6 +71,43 @@ const handleToggleHide = async (lectureId, isHidden) => {
     const reader = new FileReader();
     reader.onload = (event) => setPreview(event.target.result);
     reader.readAsDataURL(file);
+  };
+
+  const handleEditLecture = (lecture) => {
+    setEditingLectureId(lecture._id);
+    setEditNameAr(lecture.name_ar || "");
+    setEditNameEn(lecture.name_en || "");
+    setEditNameDe(lecture.name_de || "");
+    setEditImage(null);
+    setEditPreviewImage(lecture.imageUrl ? lecture.imageUrl : null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingLectureId(null);
+    setEditNameAr("");
+    setEditNameEn("");
+    setEditNameDe("");
+    setEditImage(null);
+    setEditPreviewImage(null);
+  };
+
+  const handleUpdateLecture = async (id) => {
+    try {
+      const formData = new FormData();
+      formData.append('name', editNameAr || editNameEn || editNameDe);
+      formData.append('name_ar', editNameAr);
+      formData.append('name_en', editNameEn);
+      formData.append('name_de', editNameDe);
+      if (editImage) formData.append('image', editImage);
+
+      await axios.put(`/lecture/${id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      handleCancelEdit();
+      fetchResearchAndLectures();
+    } catch (err) {
+      console.error('❌ خطأ أثناء تحديث المحاضرة:', err);
+    }
   };
 
 
@@ -112,6 +159,7 @@ const handleToggleHide = async (lectureId, isHidden) => {
       </h2>
 
       {/* ➕ إضافة محاضرة */}
+      {can('addLecture') && (
       <div className="grid grid-cols-1 gap-4 mb-6">
         <div>
           <label className="block text-sm font-medium mb-1">Lecture Name (Arabic)</label>
@@ -170,6 +218,7 @@ const handleToggleHide = async (lectureId, isHidden) => {
           + إضافة
         </button>
       </div>
+      )}
 
       {/* 📋 قائمة المحاضرات */}
       {lectures.length === 0 ? (
@@ -187,44 +236,103 @@ const handleToggleHide = async (lectureId, isHidden) => {
             {lectures.map((lecture, index) => (
               <tr key={lecture._id} className="border-t hover:bg-gray-50">
                 <td className="p-2">{index + 1}</td>
-                <td className="p-2">{getLocalizedValue(lecture, 'name', i18n.language)}</td>
+                <td className="p-2">
+                  {editingLectureId === lecture._id ? (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2"
+                        value={editNameAr}
+                        onChange={(e) => setEditNameAr(e.target.value)}
+                        placeholder="اسم المحاضرة بالعربية"
+                      />
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2"
+                        value={editNameEn}
+                        onChange={(e) => setEditNameEn(e.target.value)}
+                        placeholder="Lecture name in English"
+                      />
+                      <input
+                        type="text"
+                        className="w-full border rounded p-2"
+                        value={editNameDe}
+                        onChange={(e) => setEditNameDe(e.target.value)}
+                        placeholder="Vorlesungsname auf Deutsch"
+                      />
+
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => handleImageChange(e.target.files[0], setEditPreviewImage, setEditImage)}
+                      />
+
+                      {editPreviewImage && (
+                        <img src={editPreviewImage} alt="preview" className="w-40 h-24 object-cover rounded" />
+                      )}
+                    </div>
+                  ) : (
+                    <span>{getLocalizedValue(lecture, 'name', i18n.language)}</span>
+                  )}
+                </td>
                 <td className="p-2 text-center">
                   <div className="flex justify-center gap-2">
-                    {/* 👁 عرض تفاصيل المحاضرة (الدروس) */}
                     <button
-                      onClick={() => navigate(`/lecture/${lecture._id}/lessons`,{
-      state: {
-        mainId: mainId,
-          researchId:researchId
-      }
-    })
-                    
-                    
-                    
-                    
-                    }
+                      onClick={() => navigate(`/lecture/${lecture._id}/lessons`, {
+                        state: { mainId: mainId, researchId: researchId }
+                      })}
                       className="bg-blue-500 text-white px-3 py-1 rounded"
                     >
                       عرض التفاصيل
                     </button>
 
-                    {/* 🗑 حذف */}
-                    <button
-                      onClick={() => handleDeleteLecture(lecture._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded"
-                    >
-                      حذف
-                    </button>
+                    {editingLectureId === lecture._id ? (
+                      <>
+                        <button
+                          onClick={() => handleUpdateLecture(lecture._id)}
+                          className="bg-green-500 text-white px-3 py-1 rounded"
+                        >
+                          حفظ
+                        </button>
+                        <button
+                          onClick={handleCancelEdit}
+                          className="bg-gray-300 text-black px-3 py-1 rounded"
+                        >
+                          إلغاء
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        {can('updateLecture') && (
+                          <button
+                            onClick={() => handleEditLecture(lecture)}
+                            className="bg-yellow-500 text-white px-3 py-1 rounded"
+                          >
+                            تعديل
+                          </button>
+                        )}
+
+                        {can('deleteLecture') && (
+                          <button
+                            onClick={() => handleDeleteLecture(lecture._id)}
+                            className="bg-red-500 text-white px-3 py-1 rounded"
+                          >
+                            حذف
+                          </button>
+                        )}
+                      </>
+                    )}
                   </div>
-                                 {/* إضافة Toggle */}
-      <div className="mt-4">
-        <label>إخفاء من التطبيق الجوال</label>
-        <input
-          type="checkbox"
-          checked={lecture.isHidden}
-          onChange={(e) => handleToggleHide(lecture._id, e.target.checked)}
-        />
-      </div>
+                  {/* إضافة Toggle */}
+                  <div className="mt-4">
+                    <label>إخفاء من التطبيق الجوال</label>
+                    <input
+                      type="checkbox"
+                      checked={lecture.isHidden}
+                      onChange={(e) => handleToggleHide(lecture._id, e.target.checked)}
+                      disabled={!can('updateLecture')}
+                    />
+                  </div>
                 </td>
               </tr>
             ))}

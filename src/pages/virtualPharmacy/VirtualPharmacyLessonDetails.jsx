@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import { useParams } from "react-router-dom";
-import { BASE_FILE_URL } from '../../config/config';import RelatedLessonsModal from "../../components/RelatedLessonsModal";import LinkableText from "../../components/LinkableText";
+import { BASE_FILE_URL } from '../../config/config';
+import RelatedLessonsModal from "../../components/RelatedLessonsModal";
+import LinkableText from "../../components/LinkableText";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
 import Swal from "sweetalert2";
 import ReactQuill from 'react-quill';
@@ -97,13 +99,19 @@ export default function VirtualPharmacyLessonDetails() {
   };
 
   const getVideoUrl = (lesson, quality = "720p") => {
-    const baseField = getLocalizedValue(lesson, 'videoUrl', i18n.language);
-    if (!baseField) return null;
+    const lang = i18n.language;
+    const baseFieldName = lang === "en" ? "videoUrl_en" : lang === "de" ? "videoUrl_de" : "videoUrl";
+    const baseUrl = lesson[baseFieldName] || lesson.videoUrl;
+    if (!baseUrl) return null;
 
-    // إذا كانت الجودة محددة، ابحث عن الحقل المقابل
-    const qualityField = `${baseField.replace('videoUrl', `videoUrl_${quality}`)}`;
-    const url = lesson[qualityField] || baseField;
-      console.log(`🔍 جلب رابط الفيديو: ${BASE_FILE_URL}/uploads${url}`);
+    const qualityFieldName = lang === "en"
+      ? `videoUrl_en_${quality}`
+      : lang === "de"
+        ? `videoUrl_de_${quality}`
+        : `videoUrl_${quality}`;
+
+    const url = lesson[qualityFieldName] || baseUrl;
+    console.log(`🔍 جلب رابط الفيديو: ${BASE_FILE_URL}/uploads${url}`);
     return url?.startsWith("http") ? url : `${BASE_FILE_URL}/uploads${url}`;
   }; 
 

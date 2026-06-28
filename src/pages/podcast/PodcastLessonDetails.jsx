@@ -3,7 +3,9 @@ import { useTranslation } from "react-i18next";
 import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import { useParams } from "react-router-dom";
-import { BASE_FILE_URL } from '../../config/config';import RelatedLessonsModal from "../../components/RelatedLessonsModal";import LinkableText from "../../components/LinkableText";
+import { BASE_FILE_URL } from '../../config/config';
+import RelatedLessonsModal from "../../components/RelatedLessonsModal";
+import LinkableText from "../../components/LinkableText";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
 import Swal from "sweetalert2";
 import ReactQuill from 'react-quill';
@@ -733,8 +735,8 @@ function CommentItem({ comment, onReply, onDeleteComment }) {
                 <div>
                     <p className="font-semibold text-gray-800">{comment.userName || "مستخدم"}</p>
                     <p className="text-xs text-gray-500">
-                        {comment.userType === "admin" ? "👨‍💼 مشرف" : 
-                         comment.userType === "manager" ? "👨‍🏫 معلم" : "👤 طالب"}
+                        {comment.userType === "admin" ? "مشرف" : 
+                         comment.userType === "manager" ? "مشرف" : "طالب"}
                     </p>
                 </div>
                 <div className="flex gap-2">

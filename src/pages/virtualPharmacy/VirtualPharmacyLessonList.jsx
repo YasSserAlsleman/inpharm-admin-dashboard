@@ -28,6 +28,7 @@ export default function VirtualPharmacyLessonList() {
     pdfFileUpload_en: null,
     pdfFileUpload_de: null,
     description_ar: "",
+       description_en: "",
     description_de: "",
     isFree: false,
     notifyOnCreate: false,
@@ -141,7 +142,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
       formData.append("description_en", newLesson.description_en);
       formData.append("description_de", newLesson.description_de);
       formData.append("isFree", newLesson.isFree);
-      formData.append("video_ar", newLesson.videoFile_ar);
+      if (newLesson.videoFile_ar) formData.append("video_ar", newLesson.videoFile_ar);
       if (newLesson.videoFile_en) formData.append("video_en", newLesson.videoFile_en);
       if (newLesson.videoFile_de) formData.append("video_de", newLesson.videoFile_de);
       if (newLesson.pdfFileUpload_ar) formData.append("pdfFile_ar", newLesson.pdfFileUpload_ar);

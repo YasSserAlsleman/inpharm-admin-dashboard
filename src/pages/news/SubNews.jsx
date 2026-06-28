@@ -131,15 +131,7 @@ const handleToggleHide = async (subNewsId, isHidden) => {
         {news ? getLocalizedValue(news, 'name', i18n.language) : "جاري تحميل القسم..."}
       </h2>
       <div className="bg-white p-6 rounded-lg shadow-md mb-6 max-w-lg mx-auto flex flex-col gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Title (English)</label>
-          <input
-            className="border border-gray-300 rounded px-3 py-2 w-full"
-            placeholder="English title"
-            value={titleEn}
-            onChange={(e) => setTitleEn(e.target.value)}
-          />
-        </div>
+      
         <div>
           <label className="block text-sm font-medium mb-1">Title (Arabic)</label>
           <input
@@ -147,6 +139,15 @@ const handleToggleHide = async (subNewsId, isHidden) => {
             placeholder="العنوان بالعربية"
             value={titleAr}
             onChange={(e) => setTitleAr(e.target.value)}
+          />
+        </div>
+          <div>
+          <label className="block text-sm font-medium mb-1">Title (English)</label>
+          <input
+            className="border border-gray-300 rounded px-3 py-2 w-full"
+            placeholder="English title"
+            value={titleEn}
+            onChange={(e) => setTitleEn(e.target.value)}
           />
         </div>
         <div>
@@ -158,16 +159,7 @@ const handleToggleHide = async (subNewsId, isHidden) => {
             onChange={(e) => setTitleDe(e.target.value)}
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium mb-1">Description (English)</label>
-          <textarea
-            className="border border-gray-300 rounded px-3 py-2 w-full"
-            placeholder="English description"
-            value={descriptionEn}
-            rows={2}
-            onChange={(e) => setDescriptionEn(e.target.value)}
-          />
-        </div>
+      
         <div>
           <label className="block text-sm font-medium mb-1">Description (Arabic)</label>
           <textarea
@@ -176,6 +168,16 @@ const handleToggleHide = async (subNewsId, isHidden) => {
             value={descriptionAr}
             rows={2}
             onChange={(e) => setDescriptionAr(e.target.value)}
+          />
+        </div>
+          <div>
+          <label className="block text-sm font-medium mb-1">Description (English)</label>
+          <textarea
+            className="border border-gray-300 rounded px-3 py-2 w-full"
+            placeholder="English description"
+            value={descriptionEn}
+            rows={2}
+            onChange={(e) => setDescriptionEn(e.target.value)}
           />
         </div>
         <div>

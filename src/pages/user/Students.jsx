@@ -176,28 +176,28 @@ const Students = () => {
       }
     },
 
-    {
-      field: "progress",
-      headerName: "Progress",
-      flex: 1,
-      valueGetter: (params) =>
-        params?.row?.progress?.length || 0
-    },
+    // {
+    //   field: "progress",
+    //   headerName: "Progress",
+    //   flex: 1,
+    //   valueGetter: (params) =>
+    //     params?.row?.progress?.length || 0
+    // },
 
-    {
-      field: "createdAt",
-      headerName: "Created At",
-      flex: 1,
-      valueGetter: (params) => {
+    // {
+    //   field: "createdAt",
+    //   headerName: "Created At",
+    //   flex: 1,
+    //   valueGetter: (params) => {
 
-        const date = params?.row?.createdAt;
+    //     const date = params?.row?.createdAt;
 
-        return date
-          ? new Date(date).toLocaleDateString()
-          : "-";
+    //     return date
+    //       ? new Date(date).toLocaleDateString()
+    //       : "-";
 
-      }
-    },
+    //   }
+    // },
 
     {
       field: "actions",
