@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import axios from '../../api/axiosClient'
 import { BASE_FILE_URL } from '../../config/config'
+import { useAuth } from '../../contexts/AuthContext'
 
 export default function Sections() {
+  const { can } = useAuth()
   const [sections, setSections] = useState([])
   const [form, setForm] = useState({ name:'', name_ar:'', name_en:'', name_de:'', order:0, active:true })
   const [file, setFile] = useState(null)
@@ -99,7 +101,9 @@ export default function Sections() {
     {/* <label className="flex items-center gap-2"><input type="checkbox" name="active" checked={form.active} onChange={handleChange} /> مفعل</label> */}
         <input type="file" onChange={handleFile} disabled={sections.length >= 4 && !editingId} />
         <div>
-          <button className="bg-primary text-white px-4 py-2 rounded mr-2" type="submit" disabled={sections.length >= 4 && !editingId}>{editingId ? 'تحديث' : 'إنشاء'}</button>
+          {((editingId && can('sections.update')) || (!editingId && can('sections.create'))) && (
+            <button className="bg-primary text-white px-4 py-2 rounded mr-2" type="submit" disabled={sections.length >= 4 && !editingId}>{editingId ? 'تحديث' : 'إنشاء'}</button>
+          )}
           {editingId && <button type="button" onClick={()=>{ setEditingId(null); setForm({ name:'', name_ar:'', name_en:'', name_de:'', order:0, active:true }) }} className="px-4 py-2">إلغاء</button>}
         </div>
       </form>
@@ -115,7 +119,7 @@ export default function Sections() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <button onClick={()=> edit(s)} className="px-3 py-1 bg-yellow-500 text-white rounded">تعديل</button>
+              {can('sections.update') && <button onClick={()=> edit(s)} className="px-3 py-1 bg-yellow-500 text-white rounded">تعديل</button>}
               {/* إخفاء زر الحذف لأن الحذف معطّل على الخادم */}
               <button disabled className="px-3 py-1 bg-red-600 text-white rounded opacity-50 cursor-not-allowed">حذف</button>
             </div>

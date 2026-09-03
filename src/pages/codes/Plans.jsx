@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useState, useEffect } from "react";
 import axios from "../../api/axiosClient";
 import { MenuItem } from "@mui/material";
+import { useAuth } from "../../contexts/AuthContext";
 const Plans = () => {
   const [duration, setDuration] = useState(1);
   const [price, setPrice] = useState("");
@@ -14,6 +15,7 @@ const Plans = () => {
     const [accessType, setAccessType] = useState("app");
   
   const [snackbar, setSnackbar] = useState({open:false,message:'',severity:'success'});
+  const { can } = useAuth();
 
   const fetchPlans = async () => {
     try {
@@ -96,7 +98,7 @@ const Plans = () => {
 
 
         <TextField label="Price" type="number" value={price} onChange={(e) => setPrice(e.target.value)} />
-        <Button variant="contained" color="secondary" onClick={addPlan}>Add Plan</Button>
+        {can('plans.create') && <Button variant="contained" color="secondary" onClick={addPlan}>Add Plan</Button>}
       </Box>
 
       <TableContainer component={Paper}>
@@ -116,9 +118,11 @@ const Plans = () => {
                 <TableCell> {durationM(plan.durationMonths || ({30: 1, 90: 3, 180: 6, 365: 12}[plan.durationDays] || plan.durationDays))}</TableCell>
                 <TableCell>${plan.price}</TableCell>
                 <TableCell>
-                  <IconButton color="error" onClick={() => deletePlan(plan._id)}>
-                    <DeleteIcon />
-                  </IconButton>
+                  {can('plans.delete') && (
+                    <IconButton color="error" onClick={() => deletePlan(plan._id)}>
+                      <DeleteIcon />
+                    </IconButton>
+                  )}
                 </TableCell>
               </TableRow>
             ))}

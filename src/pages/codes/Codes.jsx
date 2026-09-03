@@ -156,9 +156,11 @@ const durationM = (durationDays) => {
     <Box sx={{ padding: 4 }}>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb:3 }}>
         <Typography variant="h4">إدارة الأكواد</Typography>
-        <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setModalOpen(true)}>
-          توليد أكواد
-        </Button>
+        {can('codes.create') && (
+          <Button variant="contained" color="secondary" startIcon={<AddIcon />} onClick={() => setModalOpen(true)}>
+            توليد أكواد
+          </Button>
+        )}
       </Box>
 
       {/* قسم إعدادات رقم WhatsApp */}

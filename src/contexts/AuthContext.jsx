@@ -2,6 +2,35 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from '../api/axiosClient';
 import { generateDeviceFingerprint } from '../utils/fingerprint';
 
+const legacyAliases = {
+  'lessons.create': 'addLesson', 'lessons.update': 'updateLesson', 'lessons.delete': 'deleteLesson',
+  'topics.create': 'addMainTopic', 'topics.update': 'updateMainTopic', 'topics.delete': 'deleteMainTopic',
+  'research.create': 'addResearch', 'research.update': 'updateResearch', 'research.delete': 'deleteResearch',
+  'lectures.create': 'addLecture', 'lectures.update': 'updateLecture', 'lectures.delete': 'deleteLecture',
+  'questions.create': 'addQuestion', 'questions.update': 'updateQuestion', 'questions.delete': 'deleteQuestion',
+  'news.create': 'addNews', 'news.update': 'updateNews', 'news.delete': 'deleteNews',
+  'subNews.create': 'addSubNews', 'subNews.update': 'updateSubNews', 'subNews.delete': 'deleteSubNews',
+  'codes.create': 'generateCodes', 'plans.create': 'generatePlans', 'plans.update': 'updatePlans', 'plans.delete': 'deletePlans',
+  'users.delete': 'deleteUser', 'managers.create': 'createManager', 'managers.delete': 'deleteManager',
+  'students.delete': 'deleteUser',
+  'managers.permissions': 'updateManagerPermissions', 'users.role': 'changeUserRole',
+  'comments.delete': 'deleteComment', 'settings.update': 'updateAppSettings', 'about.create': 'addAbout'
+};
+
+const operationStorageAliases = {
+  'students.update': 'updateStudents', 'students.delete': 'deleteStudents',
+  'sections.create': 'createSections', 'sections.update': 'updateSections', 'sections.delete': 'deleteSections'
+};
+
+const viewStorageAliases = {
+  'lessons.view': 'viewLessons', 'topics.view': 'viewTopics', 'research.view': 'viewResearch',
+  'lectures.view': 'viewLectures', 'questions.view': 'viewQuestions', 'news.view': 'viewNews',
+  'subNews.view': 'viewSubNews', 'codes.view': 'viewCodes', 'plans.view': 'viewPlans',
+  'students.view': 'viewStudents', 'managers.view': 'viewManagers', 'about.view': 'viewAbout',
+  'sections.view': 'viewSections', 'notifications.view': 'viewNotifications'
+  , 'dashboard.view': 'dashboardView'
+};
+
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -68,7 +97,21 @@ const [loading, setLoading] = useState(true);
   const can = (permission) => {
     if (!user) return false;
     if (user.role === 'admin') return true;
-    return !!user.permissions?.[permission];
+    const legacyPermission = legacyAliases[permission];
+    const operationStoragePermission = operationStorageAliases[permission];
+    if (user.permissions?.[permission] || (legacyPermission && user.permissions?.[legacyPermission]) ||
+      (operationStoragePermission && user.permissions?.[operationStoragePermission]) ||
+      user.permissions?.[viewStorageAliases[permission]]) return true;
+    if (permission.endsWith('.view')) {
+      const resource = permission.slice(0, -5);
+      return Object.keys(user.permissions || {}).some((key) =>
+        ((key.startsWith(`${resource}.`) && key !== permission) ||
+          Object.entries(legacyAliases).some(([operation, oldKey]) =>
+            operation.startsWith(`${resource}.`) && oldKey === key)) &&
+        user.permissions[key]
+      );
+    }
+    return false;
   };
 
   return (

@@ -20,7 +20,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import axios from "../../api/axiosClient";
 import { useAuth } from "../../contexts/AuthContext";
 
-import { permissionGroups } from "../user/permissions";
+import { hasStoredPermission, permissionGroups } from "../user/permissions";
 
 const Managers = () => {
   const [managers, setManagers] = useState([]);
@@ -36,6 +36,7 @@ const Managers = () => {
   const [selectedManager, setSelectedManager] = useState(null);
   const [editingName, setEditingName] = useState("");
   const [editingPermissions, setEditingPermissions] = useState({});
+  const [createError, setCreateError] = useState("");
   const { can, user: currentUser } = useAuth();
 
   // جلب الطاقم (مدراء وأدمن)
@@ -58,15 +59,25 @@ const Managers = () => {
 
   // إنشاء مدير
   const createManager = async () => {
+    if (!name.trim() || !email.trim() || !password) {
+      setCreateError("Name, email and password are required");
+      return;
+    }
+    if (password.length < 6) {
+      setCreateError("Password must be at least 6 characters");
+      return;
+    }
+
     try {
       await axios.post("/users/create-manager", {
-        name,
-        email,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
         password,
         permissions
       });
 
       setOpen(false);
+      setCreateError("");
       setName("");
       setEmail("");
       setPassword("");
@@ -75,19 +86,23 @@ const Managers = () => {
       fetchManagers();
     } catch (err) {
       console.error(err);
+      setCreateError(err.response?.data?.message || "Failed to create manager");
     }
   };
 
   // تحديث صلاحيات المدير
   const updatePermissions = async (id, newPermissions) => {
     try {
-      await axios.patch(`/users/${id}/permissions`, {
+      const response = await axios.patch(`/users/${id}/permissions`, {
         permissions: newPermissions
       });
 
       fetchManagers();
+      return response.data;
     } catch (err) {
       console.error(err);
+      alert(err.response?.data?.message || "Failed to update permissions");
+      throw err;
     }
   };
 
@@ -114,8 +129,12 @@ const Managers = () => {
 
   const savePermissionChanges = async () => {
     if (!selectedManager) return;
-    await updatePermissions(selectedManager._id, editingPermissions);
-    closePermissionEditor();
+    try {
+      await updatePermissions(selectedManager._id, editingPermissions);
+      closePermissionEditor();
+    } catch (err) {
+      return;
+    }
   };
 
   const openNameEditor = (manager) => {
@@ -177,7 +196,7 @@ const Managers = () => {
   const getPermissionSummary = (permissions = {}) => {
     const granted = permissionGroups
       .flatMap(group => group.permissions)
-      .filter(p => permissions?.[p.key])
+      .filter(p => hasStoredPermission(permissions, p.key))
       .map(p => p.label);
 
     if (!granted.length) {
@@ -352,7 +371,7 @@ const Managers = () => {
                         key={p.key}
                         control={
                           <Checkbox
-                            checked={!!editingPermissions[p.key]}
+                            checked={hasStoredPermission(editingPermissions, p.key)}
                             onChange={(e) =>
                               setEditingPermissions({
                                 ...editingPermissions,
@@ -383,6 +402,12 @@ const Managers = () => {
         <DialogTitle>Create Staff Account</DialogTitle>
 
         <DialogContent>
+
+          {createError && (
+            <Typography color="error" sx={{ mt: 2 }}>
+              {createError}
+            </Typography>
+          )}
 
           <TextField
             label="Name"

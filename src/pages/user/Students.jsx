@@ -213,7 +213,7 @@ const Students = () => {
           >
             👁️ التفاصيل
           </Button>
-          {can('deleteUser') && (
+          {can('students.delete') && (
             <Button
               variant="contained"
               color="error"
@@ -295,7 +295,7 @@ const Students = () => {
                                 <Typography variant="body2"><strong>الحالة:</strong> <Chip label={sub.status} size="small" color={sub.status === "active" ? "success" : sub.status === "revoked" ? "error" : "warning"} /></Typography>
                                 <Typography variant="body2"><strong>تاريخ التفعيل:</strong> {new Date(sub.activatedAt).toLocaleDateString('ar-SA')}</Typography>
                               </Box>
-                              {sub.status === "active" && can('deleteUser') && (
+                              {sub.status === "active" && can('students.delete') && (
                                 <Button
                                   variant="contained"
                                   color="error"
