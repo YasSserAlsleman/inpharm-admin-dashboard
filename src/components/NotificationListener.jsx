@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
 import socket from '../utils/socket';
-import Swal from 'sweetalert2';
 import { useAuth } from '../contexts/AuthContext';
 
 const NotificationListener = () => {
   const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
+    const joinAdminRoom = () => socket.emit('join-admin');
+
     if (isAuthenticated && (user?.role === 'admin' || user?.role === 'manager')) {
       // الاتصال بالسوكت وانضمام لغرفة الإدارة
+      socket.auth = { token: localStorage.getItem('token') };
       socket.connect();
-      socket.emit('join-admin');
+
+      socket.on('connect', joinAdminRoom);
 
       // الاستماع للإشعارات الجديدة
       socket.on('new-notification', (data) => {
@@ -18,23 +21,6 @@ const NotificationListener = () => {
         
         window.dispatchEvent(new Event('notifications-updated'));
         window.dispatchEvent(new CustomEvent('new-notification-local', { detail: data }));
-
-        // إظهار تنبيه مرئي (Toast)
-        Swal.fire({
-          title: data.title,
-          text: data.body,
-          icon: data.type === 'admin_report' ? 'warning' : 'info',
-          toast: true,
-          position: 'top-end',
-          showConfirmButton: false,
-          timer: 5000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.addEventListener('mouseenter', Swal.stopTimer);
-            toast.addEventListener('mouseleave', Swal.resumeTimer);
-            // تشغيل صوت تنبيه بسيط إذا أردت
-          }
-        });
       });
     } else {
       socket.disconnect();
@@ -42,6 +28,7 @@ const NotificationListener = () => {
 
     return () => {
       socket.off('new-notification');
+      socket.off('connect', joinAdminRoom);
       socket.disconnect();
     };
   }, [isAuthenticated, user]);

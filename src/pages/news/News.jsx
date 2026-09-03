@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 
 import NewsCard from "../../components/NewsCard";
+import RichTextEditor from "../../components/RichTextEditor";
 
 export default function News() {
 
@@ -141,44 +142,23 @@ const handleToggleHide = async (newsId, isHidden) => {
                
                 <div>
                   <label className="block text-sm font-medium mb-1">Description (Arabic)</label>
-                  <textarea
-                    className="w-full border border-gray-300 rounded px-3 py-2 overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                    placeholder="الوصف بالعربية"
+                  <RichTextEditor
                     value={newDescriptionAr}
-                    rows={2}
-                    onChange={(e) => setNewDescriptionAr(e.target.value)}
-                    onInput={(e) => {
-                      e.target.style.height = "auto";
-                      e.target.style.height = e.target.scrollHeight + "px";
-                    }}
+                    onChange={setNewDescriptionAr}
                   />
                 </div>
                  <div>
                   <label className="block text-sm font-medium mb-1">Description (English)</label>
-                  <textarea
-                    className="w-full border border-gray-300 rounded px-3 py-2 overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                    placeholder="English description"
+                  <RichTextEditor
                     value={newDescriptionEn}
-                    rows={2}
-                    onChange={(e) => setNewDescriptionEn(e.target.value)}
-                    onInput={(e) => {
-                      e.target.style.height = "auto";
-                      e.target.style.height = e.target.scrollHeight + "px";
-                    }}
+                    onChange={setNewDescriptionEn}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Description (German)</label>
-                  <textarea
-                    className="w-full border border-gray-300 rounded px-3 py-2 overflow-hidden focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
-                    placeholder="Beschreibung auf Deutsch"
+                  <RichTextEditor
                     value={newDescriptionDe}
-                    rows={2}
-                    onChange={(e) => setNewDescriptionDe(e.target.value)}
-                    onInput={(e) => {
-                      e.target.style.height = "auto";
-                      e.target.style.height = e.target.scrollHeight + "px";
-                    }}
+                    onChange={setNewDescriptionDe}
                   />
                 </div>
               </div>

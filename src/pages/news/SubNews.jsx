@@ -6,6 +6,7 @@ import { BASE_FILE_URL } from '../../config/config'
 import { useParams, useNavigate, Link } from "react-router-dom";
 
 import SubNewsCard from "../../components/SubNewsCard";
+import RichTextEditor from "../../components/RichTextEditor";
 
 export default function SubNews() {
   const { newsId } = useParams(); // القسم الذي نعرض أخباره
@@ -162,32 +163,23 @@ const handleToggleHide = async (subNewsId, isHidden) => {
       
         <div>
           <label className="block text-sm font-medium mb-1">Description (Arabic)</label>
-          <textarea
-            className="border border-gray-300 rounded px-3 py-2 w-full"
-            placeholder="الوصف بالعربية"
+          <RichTextEditor
             value={descriptionAr}
-            rows={2}
-            onChange={(e) => setDescriptionAr(e.target.value)}
+            onChange={setDescriptionAr}
           />
         </div>
           <div>
           <label className="block text-sm font-medium mb-1">Description (English)</label>
-          <textarea
-            className="border border-gray-300 rounded px-3 py-2 w-full"
-            placeholder="English description"
+          <RichTextEditor
             value={descriptionEn}
-            rows={2}
-            onChange={(e) => setDescriptionEn(e.target.value)}
+            onChange={setDescriptionEn}
           />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">Description (German)</label>
-          <textarea
-            className="border border-gray-300 rounded px-3 py-2 w-full"
-            placeholder="Beschreibung auf Deutsch"
+          <RichTextEditor
             value={descriptionDe}
-            rows={2}
-            onChange={(e) => setDescriptionDe(e.target.value)}
+            onChange={setDescriptionDe}
           />
         </div>
 

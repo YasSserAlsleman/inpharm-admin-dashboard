@@ -27,7 +27,18 @@ export default function Notifications() {
   };
 
   useEffect(() => {
-    fetchNotifications();
+    const openNotifications = async () => {
+      await fetchNotifications();
+      try {
+        await axios.patch("/notifications/read-all", {});
+        setNotifications((current) => current.map((notification) => ({ ...notification, isRead: true })));
+        window.dispatchEvent(new Event('notifications-updated'));
+      } catch (err) {
+        console.error("❌ Error marking notifications as read:", err);
+      }
+    };
+
+    openNotifications();
   }, []);
 
   const getIcon = (type) => {
@@ -55,7 +66,19 @@ export default function Notifications() {
     }
     
     // Navigate based on type
-    if (n.type === 'admin_new_comment' || n.type === 'reply' || n.type === 'admin_report') {
+    if (n.type === 'admin_report') {
+      if (n.data?.lessonId && n.data?.commentId) {
+        const lessonType = n.data.lessonType;
+        const commentsPath = lessonType === 'virtualPharmacy'
+          ? `/virtualPharmacyLesson/${n.data.lessonId}/comments`
+          : lessonType === 'podcast'
+            ? `/podcastLesson/${n.data.lessonId}/comments`
+            : lessonType === 'germanyPharmacy'
+              ? `/germanyPharmacyLesson/${n.data.lessonId}/comments`
+            : `/learningLesson/${n.data.lessonId}/comments`;
+        navigate(`${commentsPath}?commentId=${encodeURIComponent(n.data.commentId)}`);
+      }
+    } else if (n.type === 'admin_new_comment' || n.type === 'reply') {
       if (n.data?.lessonId) {
         const lessonType = n.data.lessonType;
         if (lessonType === 'virtualPharmacy') {

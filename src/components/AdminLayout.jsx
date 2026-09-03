@@ -4,10 +4,11 @@ import { useAuth } from '../contexts/AuthContext'
 import { Snackbar, Alert } from "@mui/material"
 import { useTranslation } from 'react-i18next'
 import axios from '../api/axiosClient'
+import { BASE_FILE_URL } from '../config/config'
 
   export default function AdminLayout({ children }) {
     const navigate = useNavigate()
-    const { logout } = useAuth()
+    const { logout, user } = useAuth()
     const { t, i18n } = useTranslation()
 
     const handleLogout = () => {
@@ -26,9 +27,22 @@ import axios from '../api/axiosClient'
     severity:"error"
   })
 
+  const [sectionsNav, setSectionsNav] = useState([])
+
   const [unreadCount, setUnreadCount] = useState(0)
 
   useEffect(()=>{
+    // جلب قائمة الأقسام لعرضها في الشريط الجانبي
+    const fetchSectionsNav = async () => {
+      try {
+        const res = await axios.get('/sections')
+        setSectionsNav(res.data || [])
+      } catch (err) {
+        console.error('Failed to load sections for sidebar', err)
+      }
+    }
+    fetchSectionsNav()
+
     const refreshUnreadCount = async () => {
       try {
         const res = await axios.get("/notifications/unread-count");
@@ -67,6 +81,7 @@ import axios from '../api/axiosClient'
 
   },[])
 
+
     return (
       <div className="min-h-screen flex">
         <aside className="w-64 bg-primary text-white p-4">
@@ -92,23 +107,32 @@ import axios from '../api/axiosClient'
           <nav className="space-y-2">
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/">{t('navigation.learning')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/virtualPharmacy">{t('navigation.virtualPharmacy')}</Link>
+            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/pharmacy-germany">{t('navigation.pharmacyGermany')}</Link>
+
+          
+
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/podcast">{t('navigation.podcast')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/news">{t('navigation.news')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/about">{t('navigation.about')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/codes">{t('navigation.codes')}</Link>
             <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/plans">{t('navigation.plans')}</Link>
-            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/Students">{t('navigation.students')}</Link>
-            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/Managers">{t('navigation.managers')}</Link>
-            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/change-password">{t('navigation.changePassword')}</Link>
-            <Link className="block py-2 px-3 rounded hover:bg-primary/80 flex items-center justify-between" to="/notifications">
-              <span>{t('navigation.notifications')}</span>
-              {unreadCount > 0 && (
-                <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                  {unreadCount}
-                </span>
-              )}
-            </Link>
 
+            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/Students">{t('navigation.students')}</Link>
+            <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/managers">{t('navigation.managers')}</Link>
+
+            <div className="mt-4">
+              <div className="text-xs uppercase text-white/80 px-3 mb-2">{t('navigation.settings')}</div>
+              <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/change-password">{t('navigation.changePassword')}</Link>
+              <Link className="block py-2 px-3 rounded hover:bg-primary/80 flex items-center justify-between" to="/notifications">
+                <span>{t('navigation.notifications')}</span>
+                {unreadCount > 0 && (
+                  <span className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full">{unreadCount}</span>
+                )}
+              </Link>
+              {(user && (user.role === 'admin' || user.role === 'manager')) && (
+                <Link className="block py-2 px-3 rounded hover:bg-primary/80" to="/sections">{t('navigation.sections')}</Link>
+              )}
+            </div>
 
           </nav>
 

@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../utils/getLocalizedValue';
+import RichTextEditor from './RichTextEditor';
+import LinkableText from './LinkableText';
 
 export default function NewsCard({ item, handleDeleteNews, handleSaveEdit, navigate, handleToggleHide }) {
   const { i18n, t } = useTranslation();
@@ -35,26 +37,17 @@ export default function NewsCard({ item, handleDeleteNews, handleSaveEdit, navig
             value={editNameDe}
             onChange={(e) => setEditNameDe(e.target.value)}
           />
-          <textarea
-            className="border rounded px-3 py-2 overflow-hidden"
-            placeholder="الوصف (العربية)"
+          <RichTextEditor
             value={editDescriptionAr}
-            rows={1}
-            onChange={(e) => setEditDescriptionAr(e.target.value)}
+            onChange={setEditDescriptionAr}
           />
-          <textarea
-            className="border rounded px-3 py-2 overflow-hidden"
-            placeholder="Description (English)"
+          <RichTextEditor
             value={editDescriptionEn}
-            rows={1}
-            onChange={(e) => setEditDescriptionEn(e.target.value)}
+            onChange={setEditDescriptionEn}
           />
-          <textarea
-            className="border rounded px-3 py-2 overflow-hidden"
-            placeholder="Beschreibung (Deutsch)"
+          <RichTextEditor
             value={editDescriptionDe}
-            rows={1}
-            onChange={(e) => setEditDescriptionDe(e.target.value)}
+            onChange={setEditDescriptionDe}
           />
           <div className="flex gap-2 mt-2">
             <button
@@ -85,7 +78,7 @@ export default function NewsCard({ item, handleDeleteNews, handleSaveEdit, navig
       ) : (
         <>
           <h3 className="font-semibold text-lg text-gray-800">{getLocalizedValue(item, 'name', i18n.language)}</h3>
-          <p className="text-gray-600 mt-2 mb-4">{getLocalizedValue(item, 'description', i18n.language)}</p>
+          <LinkableText className="text-gray-600 mt-2 mb-4" text={getLocalizedValue(item, 'description', i18n.language)} />
           <div className="flex gap-2">
             <button
               className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 text-sm"

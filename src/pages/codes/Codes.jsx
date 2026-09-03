@@ -2,8 +2,13 @@
 // Codes.jsx - توليد الأكواد وجدول الأكواد المتقدم
 // ================================
 
-import { Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, Paper, TableContainer, Chip, TextField, MenuItem, Snackbar, Alert, Pagination } from "@mui/material";
+import { Box, Typography, Button, Table, TableHead, TableRow, TableCell, TableBody, Paper, TableContainer, Chip, TextField, MenuItem, Snackbar, Alert, Pagination, InputAdornment, Divider } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
+import SearchIcon from '@mui/icons-material/Search';
+import WhatsAppIcon from '@mui/icons-material/WhatsApp';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import CloseIcon from '@mui/icons-material/Close';
 import { useState, useEffect } from "react";
 import axios from '../../api/axiosClient';
 import GenerateCodesModal from '../codes/GenerateCodesModal';
@@ -15,12 +20,15 @@ const Codes = () => {
   const [plans, setPlans] = useState([]);
   const [filterPlan, setFilterPlan] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [snackbar, setSnackbar] = useState({open:false,message:'',severity:'success'});
   const [whatsappPhone, setWhatsappPhone] = useState('');
   const [isEditingPhone, setIsEditingPhone] = useState(false);
   const [phoneTempValue, setPhoneTempValue] = useState('');
+  const [buyCodeMessages, setBuyCodeMessages] = useState({ ar: '', en: '', de: '' });
+  const [messageTempValues, setMessageTempValues] = useState({ ar: '', en: '', de: '' });
   const { can } = useAuth();
   const limit = 10;
 
@@ -37,6 +45,11 @@ const Codes = () => {
     try {
       const res = await axios.get('/settings/whatsapp-phone');
       setWhatsappPhone(res.data.phone || '');
+      setBuyCodeMessages({
+        ar: res.data.messages?.ar || 'مرحبا اريد شراء كود',
+        en: res.data.messages?.en || 'Hello, I want to buy a code',
+        de: res.data.messages?.de || 'Hallo, ich möchte einen Code kaufen',
+      });
     } catch (err) {
       console.error(err);
     }
@@ -44,8 +57,14 @@ const Codes = () => {
 
   const saveWhatsAppPhone = async () => {
     try {
-      await axios.post('/settings/whatsapp-phone', { phone: phoneTempValue });
+      await axios.post('/settings/whatsapp-phone', {
+        phone: phoneTempValue,
+        messageAr: messageTempValues.ar,
+        messageEn: messageTempValues.en,
+        messageDe: messageTempValues.de,
+      });
       setWhatsappPhone(phoneTempValue);
+      setBuyCodeMessages(messageTempValues);
       setIsEditingPhone(false);
       setSnackbar({open:true,message:'رقم WhatsApp تم حفظه بنجاح',severity:'success'});
     } catch (err) {
@@ -57,6 +76,7 @@ const Codes = () => {
   const fetchCodes = async () => {
     try {
       const params = { page, limit };
+      if (searchQuery.trim()) params.q = searchQuery.trim();
       if(filterPlan) params.planId = filterPlan;
       if(filterStatus) params.status = filterStatus;
       const res = await axios.get('/codes', { params });
@@ -74,7 +94,7 @@ const Codes = () => {
 
   useEffect(() => {
     fetchCodes();
-  }, [filterPlan, filterStatus, page]);
+  }, [filterPlan, filterStatus, searchQuery, page]);
 
 
 const formatCsvValue = (value) => {
@@ -88,14 +108,19 @@ const formatCsvValue = (value) => {
 const exportCodes = () => {
   if (!codes.length) return;
 
-  const headers = ["Code", "Plan", "Duration", "UsedBy", "Status"];
+  const headers = ["Code", "Access Type", "Duration", "Created At", "Expires At"];
+  const formatDate = (value) => {
+    if (!value) return '';
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? '' : date.toISOString().slice(0, 10);
+  };
 
   const rows = codes.map((c) => [
-    formatCsvValue(c.code || ''),
-    formatCsvValue(c.planId?.accessType || c.accessType || 'Unknown'),
-    formatCsvValue(durationM(c.planId?.durationDays || c.durationDays)),
-    formatCsvValue(c.usedBy?.name || c.usedBy || '-'),
-    formatCsvValue(c.isUsed ? 'Used' : 'Unused'),
+    c.code || '',
+    c.planId?.accessType || c.accessType || 'Unknown',
+    durationM(c.planId?.durationMonths || c.planId?.durationDays || c.durationDays),
+    formatDate(c.createdAt),
+    formatDate(c.expiresAt),
   ]);
  
   const delimiter = ';';
@@ -106,7 +131,7 @@ const exportCodes = () => {
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
 
   const accessType = codes[0]?.planId?.accessType || codes[0]?.accessType || 'plan';
-  const duration = codes[0]?.planId?.durationDays || codes[0]?.durationDays || 'all';
+  const duration = codes[0]?.planId?.durationMonths || codes[0]?.planId?.durationDays || codes[0]?.durationDays || 'all';
   const fileName = `${accessType}_${duration}_codes.csv`;
 
   const url = URL.createObjectURL(blob);
@@ -120,14 +145,12 @@ const exportCodes = () => {
 };
 
 const durationM = (durationDays) => {
-
-   if(durationDays==30) return "1 Month" 
-    else if (durationDays==90) return "3 Months" 
-      else if(durationDays==180) return "6 Months" 
-    else  return "1 Year" 
-
-       
- 
+  const durationMonths = ({ 30: 1, 90: 3, 180: 6, 365: 12 }[durationDays] || durationDays);
+  if (durationMonths === 1) return "1 Month";
+  if (durationMonths === 3) return "3 Months";
+  if (durationMonths === 6) return "6 Months";
+  if (durationMonths === 12) return "1 Year";
+  return `${durationMonths} Months`;
   };
   return (
     <Box sx={{ padding: 4 }}>
@@ -139,40 +162,45 @@ const durationM = (durationDays) => {
       </Box>
 
       {/* قسم إعدادات رقم WhatsApp */}
-      <Box sx={{ 
-        backgroundColor: '#f5f5f5', 
-        padding: 2, 
-        borderRadius: 2, 
-        marginBottom: 3,
-        border: '1px solid #ddd'
-      }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb:2 }}>
-          <Typography variant="h6">⚙️ إعدادات WhatsApp</Typography>
+      <Paper elevation={0} sx={{ p: { xs: 2, md: 3 }, mb: 3, border: '1px solid', borderColor: 'divider', borderRadius: 3, background: 'linear-gradient(135deg, #f0fdf4 0%, #ffffff 70%)' }}>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2, mb: 2 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5 }}>
+            <Box sx={{ width: 42, height: 42, display: 'grid', placeItems: 'center', borderRadius: 2, bgcolor: '#dcfce7', color: '#16a34a' }}>
+              <WhatsAppIcon />
+            </Box>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 700 }}>إعدادات شراء الأكواد</Typography>
+              <Typography variant="body2" color="text.secondary">بيانات التواصل والرسالة التي تظهر عند طلب شراء كود</Typography>
+            </Box>
+          </Box>
         </Box>
         
         {!isEditingPhone ? (
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(220px, .7fr) 1fr' }, gap: 3, alignItems: 'center' }}>
             <Box>
-              <Typography variant="body2" sx={{ color: '#666' }}>رقم WhatsApp للتواصل:</Typography>
-              <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold' }}>
+              <Typography variant="body2" color="text.secondary">رقم WhatsApp للتواصل</Typography>
+              <Typography variant="h6" sx={{ mt: 0.5, fontWeight: 700, direction: 'ltr', textAlign: 'right' }}>
                 {whatsappPhone || 'لم يتم تعيين رقم'}
               </Typography>
             </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
+              <Typography variant="body2" color="text.secondary">الرسالة الحالية</Typography>
+              <Typography sx={{ p: 1.25, bgcolor: 'rgba(255,255,255,.8)', border: '1px solid', borderColor: 'divider', borderRadius: 1.5 }}>{buyCodeMessages.ar}</Typography>
+            </Box>
             {can('updateAppSettings') && (
-              <Button 
-                variant="contained" 
-                color="primary"
+              <Button variant="outlined" startIcon={<EditIcon />} sx={{ gridColumn: { xs: '1', md: '1 / -1' }, justifySelf: { md: 'start' } }}
                 onClick={() => {
                   setIsEditingPhone(true);
                   setPhoneTempValue(whatsappPhone);
+                  setMessageTempValues(buyCodeMessages);
                 }}
               >
-                تعديل
+                تعديل الإعدادات
               </Button>
             )}
           </Box>
         ) : (
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'flex-end' }}>
+          <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(220px, .7fr) 1fr' }, gap: 2 }}>
             <TextField 
               label="رقم WhatsApp"
               placeholder="+966541234567"
@@ -181,28 +209,26 @@ const durationM = (durationDays) => {
               fullWidth
               variant="outlined"
             />
-            <Button 
-              variant="contained" 
-              color="success"
-              onClick={saveWhatsAppPhone}
-            >
-              حفظ
-            </Button>
-            <Button 
-              variant="outlined"
-              onClick={() => setIsEditingPhone(false)}
-            >
-              إلغاء
-            </Button>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, flex: 2 }}>
+              <TextField label="رسالة الشراء بالعربية" value={messageTempValues.ar} onChange={(e) => setMessageTempValues({ ...messageTempValues, ar: e.target.value })} fullWidth multiline />
+              <TextField label="رسالة الشراء بالإنجليزية" value={messageTempValues.en} onChange={(e) => setMessageTempValues({ ...messageTempValues, en: e.target.value })} fullWidth multiline />
+              <TextField label="رسالة الشراء بالألمانية" value={messageTempValues.de} onChange={(e) => setMessageTempValues({ ...messageTempValues, de: e.target.value })} fullWidth multiline />
+            </Box>
+            <Box sx={{ gridColumn: { xs: '1', md: '1 / -1' }, display: 'flex', justifyContent: 'flex-end', gap: 1, pt: 1 }}>
+              <Button variant="contained" color="success" startIcon={<SaveIcon />} onClick={saveWhatsAppPhone}>حفظ التغييرات</Button>
+              <Button variant="outlined" startIcon={<CloseIcon />} onClick={() => setIsEditingPhone(false)}>إلغاء</Button>
+            </Box>
           </Box>
         )}
-      </Box>
+        <Divider sx={{ mt: 2 }} />
+      </Paper>
 
-      <Box sx={{ display:'flex', gap:2, mb:2 }}>
+      <Box sx={{ display:'flex', gap:2, mb:2, flexWrap: 'wrap', alignItems: 'center' }}>
+        <TextField label="البحث عن كود" placeholder="اكتب جزءًا من الكود" value={searchQuery} onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }} sx={{ minWidth: { xs: '100%', md: 280 }, flex: 1 }} InputProps={{ startAdornment: <InputAdornment position="start"><SearchIcon color="action" /></InputAdornment> }} />
         <TextField select label="تصفية الخطة" value={filterPlan} onChange={(e)=>{setFilterPlan(e.target.value); setPage(1);}} sx={{minWidth:150}}>
           <MenuItem value="">جميع الخطط</MenuItem>
           {plans.map(plan=>(
-            <MenuItem key={plan._id} value={plan._id}>{plan.accessType} ({durationM(plan.durationDays)})</MenuItem>
+            <MenuItem key={plan._id} value={plan._id}>{plan.accessType} ({durationM(plan.durationMonths || plan.durationDays)})</MenuItem>
           ))}
         </TextField>
 
@@ -237,7 +263,7 @@ const durationM = (durationDays) => {
             {codes.map(c=>(
               <TableRow key={c._id}>
                 <TableCell>{c.code}</TableCell>
-                <TableCell>{c.planId ? `${c.accessType} (${durationM(c.planId.durationDays)})` : 'Unknown'}</TableCell>
+                <TableCell>{c.planId ? `${c.accessType} (${durationM(c.planId.durationMonths || c.planId.durationDays)})` : 'Unknown'}</TableCell>
                 <TableCell>{c.usedBy?.name || '-'}</TableCell>
                 <TableCell>
                   {c.isUsed ? <Chip label="Used" color="success" /> : <Chip label="Unused" sx={{background:'orange',color:'white'}} />}

@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../utils/getLocalizedValue';
 import { BASE_FILE_URL } from '../config/config';
+import RichTextEditor from './RichTextEditor';
+import LinkableText from './LinkableText';
 
 export default function SubNewsCard({ item, handleDelete, handleSaveEdit, handleToggleHide }) {
   const { i18n, t } = useTranslation();
@@ -47,26 +49,17 @@ export default function SubNewsCard({ item, handleDelete, handleSaveEdit, handle
             value={editTitleDe}
             onChange={(e) => setEditTitleDe(e.target.value)}
           />
-          <textarea
-            className="border rounded px-3 py-2 text-sm"
-            placeholder="الوصف (العربية)"
+          <RichTextEditor
             value={editDescriptionAr}
-            rows={2}
-            onChange={(e) => setEditDescriptionAr(e.target.value)}
+            onChange={setEditDescriptionAr}
           />
-          <textarea
-            className="border rounded px-3 py-2 text-sm"
-            placeholder="Description (English)"
+          <RichTextEditor
             value={editDescriptionEn}
-            rows={2}
-            onChange={(e) => setEditDescriptionEn(e.target.value)}
+            onChange={setEditDescriptionEn}
           />
-          <textarea
-            className="border rounded px-3 py-2 text-sm"
-            placeholder="Beschreibung (Deutsch)"
+          <RichTextEditor
             value={editDescriptionDe}
-            rows={2}
-            onChange={(e) => setEditDescriptionDe(e.target.value)}
+            onChange={setEditDescriptionDe}
           />
           
           <div className="border-t pt-2">
@@ -122,9 +115,10 @@ export default function SubNewsCard({ item, handleDelete, handleSaveEdit, handle
       ) : (
         <>
           <h3 className="font-semibold text-lg">{getLocalizedValue(item, 'title', i18n.language)}</h3>
-          <p className="text-gray-600 text-sm mt-1 mb-3">
-            {getLocalizedValue(item, 'description', i18n.language)}
-          </p>
+          <LinkableText
+            className="text-gray-600 text-sm mt-1 mb-3"
+            text={getLocalizedValue(item, 'description', i18n.language)}
+          />
 
           {item.image && (
             <img

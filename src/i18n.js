@@ -11,6 +11,7 @@ const resources = {
       navigation: {
         learning: 'Learning',
         virtualPharmacy: 'Virtual Pharmacy',
+        pharmacyGermany: 'Pharmacy in Germany',
         podcast: 'Podcast',
         news: 'News',
         about: 'About',
@@ -18,6 +19,9 @@ const resources = {
         plans: 'Plans',
         students: 'Students',
         managers: 'Managers',
+        users: 'Users',
+        settings: 'Settings', 
+        sections: 'Sections',
         changePassword: 'Change Password',
         notifications: 'Notifications'
       },
@@ -40,6 +44,7 @@ const resources = {
         deviceMismatch: 'Login from another device. Only one device login is allowed.'
       },
       lessons: {
+        availableLanguages: 'Available languages',
         addLesson: 'Add Lesson',
         adding: 'Adding...',
         lessonName: 'Lesson Name',
@@ -113,6 +118,26 @@ const resources = {
         confirm: 'Confirm',
         notAvailable: 'Not available',
         unknown: 'Unknown'
+      },
+      germanyPharmacy: {
+        pageTitle: 'Main Topics',
+        addTopic: 'Add Topic',
+        noTopics: 'No main topics yet.',
+        nameAr: 'Main topic name (Arabic)',
+        nameEn: 'Main topic name (English)',
+        nameDe: 'Main topic name (German)',
+        descriptionAr: 'Topic description (Arabic)',
+        descriptionEn: 'Topic description (English)',
+        descriptionDe: 'Topic description (German)',
+        image: 'Topic image',
+        preview: 'Preview',
+        viewResearch: 'View Research',
+        hideMobile: 'Hide from mobile app',
+        hidden: 'Hidden',
+        noDescription: 'No description available',
+        save: 'Save',
+        cancel: 'Cancel',
+        deleteConfirm: 'Do you want to delete this main topic?'
       }
     }
   },
@@ -121,7 +146,8 @@ const resources = {
       inpharmAdmin: 'إدارة إنفارم',
       navigation: {
         learning: 'التعلم',
-        virtualPharmacy: 'الصيدلية الافتراضية',
+        virtualPharmacy: 'الصيدلية الافتراضية', 
+          pharmacyGermany : 'الصيدلية في ألمانيا',
         podcast: 'البودكاست',
         news: 'الأخبار',
         about: 'حول',
@@ -129,7 +155,11 @@ const resources = {
         plans: 'الخطط',
         students: 'الطلاب',
         managers: 'المدراء',
-        notifications: 'الإشعارات'
+        users: 'المستخدمون',
+        changePassword: 'تغيير كلمة المرور',
+        notifications: 'الإشعارات',
+        sections: 'الأقسام',
+        settings: 'الإعدادات'
       },
       button: {
         logout: 'تسجيل الخروج',
@@ -150,6 +180,7 @@ const resources = {
         deviceMismatch: 'تم تسجيل الدخول من جهاز آخر. يُسمح بتسجيل الدخول من جهاز واحد فقط.'
       },
       lessons: {
+        availableLanguages: 'اللغات المتاحة',
         addLesson: 'إضافة درس',
         adding: 'جاري الإضافة...',
         lessonName: 'اسم الدرس',
@@ -222,6 +253,26 @@ const resources = {
         confirm: 'تأكيد',
         notAvailable: 'غير متاح',
         unknown: 'غير معروف'
+      },
+      germanyPharmacy: {
+        pageTitle: 'المحاور الرئيسية',
+        addTopic: 'إضافة محور',
+        noTopics: 'لا توجد محاور رئيسية بعد.',
+        nameAr: 'اسم المحور الرئيسي (العربية)',
+        nameEn: 'اسم المحور الرئيسي (الإنجليزية)',
+        nameDe: 'اسم المحور الرئيسي (الألمانية)',
+        descriptionAr: 'وصف المحور (العربية)',
+        descriptionEn: 'وصف المحور (الإنجليزية)',
+        descriptionDe: 'وصف المحور (الألمانية)',
+        image: 'صورة المحور',
+        preview: 'معاينة',
+        viewResearch: 'عرض الأبحاث',
+        hideMobile: 'إخفاء من التطبيق الجوال',
+        hidden: 'مخفي',
+        noDescription: 'لا يوجد وصف متاح',
+        save: 'حفظ',
+        cancel: 'إلغاء',
+        deleteConfirm: 'هل تريد حذف هذا المحور الرئيسي؟'
       }
     }
   },
@@ -231,6 +282,7 @@ const resources = {
       navigation: {
         learning: 'Lernen',
         virtualPharmacy: 'Virtuelle Apotheke',
+        pharmacyGermany: 'Apotheke in Deutschland',
         podcast: 'Podcast',
         news: 'Nachrichten',
         about: 'Über',
@@ -238,7 +290,12 @@ const resources = {
         plans: 'Pläne',
         students: 'Studenten',
         managers: 'Manager',
+        users: 'Benutzer',
+        changePassword: 'Passwort ändern',  
+        sections: 'Bereiche',
+        settings: 'Einstellungen',
         notifications: 'Benachrichtigungen'
+        
       },
       button: {
         logout: 'Abmelden',
@@ -259,6 +316,7 @@ const resources = {
         deviceMismatch: 'Anmeldung von einem anderen Gerät. Nur eine Geräteanmeldung ist erlaubt.'
       },
       lessons: {
+        availableLanguages: 'Verfügbare Sprachen',
         addLesson: 'Lektion hinzufügen',
         adding: 'Hinzufügen...',
         lessonName: 'Lektionsname',
@@ -331,6 +389,26 @@ const resources = {
         confirm: 'Bestätigen',
         notAvailable: 'Nicht verfügbar',
         unknown: 'Unbekannt'
+      },
+      germanyPharmacy: {
+        pageTitle: 'Hauptthemen',
+        addTopic: 'Thema hinzufügen',
+        noTopics: 'Noch keine Hauptthemen vorhanden.',
+        nameAr: 'Name des Hauptthemas (Arabisch)',
+        nameEn: 'Name des Hauptthemas (Englisch)',
+        nameDe: 'Name des Hauptthemas (Deutsch)',
+        descriptionAr: 'Beschreibung des Themas (Arabisch)',
+        descriptionEn: 'Beschreibung des Themas (Englisch)',
+        descriptionDe: 'Beschreibung des Themas (Deutsch)',
+        image: 'Themenbild',
+        preview: 'Vorschau',
+        viewResearch: 'Forschung anzeigen',
+        hideMobile: 'In der mobilen App ausblenden',
+        hidden: 'Versteckt',
+        noDescription: 'Keine Beschreibung verfügbar',
+        save: 'Speichern',
+        cancel: 'Abbrechen',
+        deleteConfirm: 'Möchten Sie dieses Hauptthema löschen?'
       }
     }
   }

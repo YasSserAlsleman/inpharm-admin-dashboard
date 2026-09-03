@@ -6,11 +6,22 @@ import PrivateRoute from "./pages/privateRoute";
 
 // Pages
 import Login from "./pages/Login";
+
+      {/* ---------------- Pharmacy in Germany (behaves like Learning) ---------------- */}
+      <Route
+        path="/pharmacy-germany"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><LearningMainTopic /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
 import NotFound from "./pages/NotFound";
 import Users from "./pages/user/Users";
 import Managers from "./pages/user/Managers";
 import Students from "./pages/user/Students";
 import ChangePassword from "./pages/user/ChangePassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import Codes from "./pages/codes/Codes";
 import Plans from "./pages/codes/Plans";
@@ -23,6 +34,14 @@ import LearningLessonDetails from "./pages/learning/LearningLessonDetails";
 import LearningQuestionList from "./pages/learning/LearningQuestionList";
 import LearningLessonComments from "./pages/learning/LearningLessonComments";
 
+import GermanyPharmacyMainTopic from "./pages/GermanyPharmacy/GermanyPharmacyMainTopic";  
+import GermanyPharmacyLectureList from "./pages/GermanyPharmacy/GermanyPharmacyLectureList";
+import GermanyPharmacyResearchList from "./pages/GermanyPharmacy/GermanyPharmacyResearchList";
+import GermanyPharmacyLessonList from "./pages/GermanyPharmacy/GermanyPharmacyLessonList";
+import GermanyPharmacyLessonDetails from "./pages/GermanyPharmacy/GermanyPharmacyLessonDetails";
+import GermanyPharmacyQuestionList from "./pages/GermanyPharmacy/GermanyPharmacyQuestionList";
+import GermanyPharmacyLessonComments from "./pages/GermanyPharmacy/GermanyPharmacyLessonComments";
+
 import VirtualPharmacyMainTopic from "./pages/virtualPharmacy/VirtualPharmacyMainTopic";
 import VirtualPharmacyLessonList from "./pages/virtualPharmacy/VirtualPharmacyLessonList";
 import VirtualPharmacyLessonDetails from  "./pages/virtualPharmacy/VirtualPharmacyLessonDetails";
@@ -34,6 +53,7 @@ import PodcastLessonList from "./pages/podcast/PodcastLessonList";
 import PodcastLessonDetails from  "./pages/podcast/PodcastLessonDetails";
 import PodcastQuestionList from   "./pages/podcast/PodcastQuestionList";
 import PodcastLessonComments from "./pages/podcast/PodcastLessonComments";
+import Sections from "./pages/sections/Sections";
 
 import News from "./pages/news/News";
 import SubNews from "./pages/news/SubNews";
@@ -50,6 +70,8 @@ function App() {
     <Routes>
       {/* 🔹 Login */}
       <Route path="/login" element={<Login />} />
+      <Route path="/inpharm" element={<ResetPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* 🔹 Dashboard / Main page (Admin + Manager) */}
       <Route
@@ -113,6 +135,67 @@ function App() {
         }
       />
 
+  
+
+      {/* ---------------- Germany Pharmacy ---------------- */}
+       <Route
+        path="/pharmacy-germany"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout>
+              <GermanyPharmacyMainTopic />
+            </AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/main/:mainId/germanyPharmacyresearch"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><GermanyPharmacyResearchList /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/germanyPharmacyResearch/:researchId/lectures"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><GermanyPharmacyLectureList /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/germanyPharmacyLecture/:lectureId/lessons"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><GermanyPharmacyLessonList /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/germanyPharmacyLesson/:lessonId/details"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><GermanyPharmacyLessonDetails /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/germanyPharmacyLesson/:lessonId/questions"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><GermanyPharmacyQuestionList /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/germanyPharmacyLesson/:lessonId/comments"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><GermanyPharmacyLessonComments /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
       {/* ---------------- Virtual Pharmacy ---------------- */}
       <Route
         path="/virtualPharmacy"
@@ -161,6 +244,14 @@ function App() {
         element={
           <PrivateRoute roles={['admin','manager']}>
             <AdminLayout><PodcastMainTopic /></AdminLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/sections"
+        element={
+          <PrivateRoute roles={['admin','manager']}>
+            <AdminLayout><Sections /></AdminLayout>
           </PrivateRoute>
         }
       />

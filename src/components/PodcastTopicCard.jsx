@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../utils/getLocalizedValue';
+import LinkableText from './LinkableText';
 import { BASE_FILE_URL } from '../config/config';  // أضف هذا في الأعلى
 
 // 🔹 مكون فرعي لعرض/تعديل محور واحد
@@ -117,11 +118,10 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
           <div className="p-4">
             <h3 className="text-lg font-semibold mb-2">{getLocalizedValue(topic, 'name', i18n.language)}</h3>
 {getLocalizedValue(topic, 'description', i18n.language) ? (
-  <p className="text-gray-600 text-sm mb-3">
-    {getLocalizedValue(topic, 'description', i18n.language).length > 100
-      ? getLocalizedValue(topic, 'description', i18n.language).slice(0, 100) + "…"
-      : getLocalizedValue(topic, 'description', i18n.language)}
-  </p>
+  <LinkableText
+    className="text-gray-600 text-sm mb-3"
+    text={getLocalizedValue(topic, 'description', i18n.language)}
+  />
 ) : (
   <p className="text-gray-400 text-sm mb-3">لا يوجد وصف متاح</p>
 )}            <div className="flex gap-2">

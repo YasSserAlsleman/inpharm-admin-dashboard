@@ -11,12 +11,28 @@ export default function LinkableText({ text, className = '' }) {
 
   // regex للبحث عن الروابط
   const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+  const hasHtml = /<\/?[a-z][^>]*>/i.test(text);
+
+  if (hasHtml) {
+    const sanitizedHtml = text
+      .replace(/<\s*(script|style|iframe|object|embed)[^>]*>[\s\S]*?<\s*\/\s*\1\s*>/gi, '')
+      .replace(/\son\w+\s*=\s*("[^"]*"|'[^']*'|[^\s>]+)/gi, '')
+      .replace(/javascript\s*:/gi, '');
+
+    return (
+      <span
+        className={className}
+        dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
+      />
+    );
+  }
+
   const parts = text.split(urlRegex);
 
   return (
     <span className={className}>
       {parts.map((part, index) => {
-        if (urlRegex.test(part)) {
+        if (/^(https?:\/\/[^\s]+|www\.[^\s]+)$/.test(part)) {
           let url = part;
           // إضافة https:// إذا لم تكن موجودة
           if (!url.startsWith('http://') && !url.startsWith('https://')) {

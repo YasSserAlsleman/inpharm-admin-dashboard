@@ -6,7 +6,7 @@ import LinkableText from './LinkableText';
 import { BASE_FILE_URL } from '../config/config';  // أضف هذا في الأعلى
 
 // 🔹 مكون فرعي لعرض/تعديل محور واحد
-export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, navigate, handleImageChange, handleToggleHide }) {
+export default function TopicCard({ topic, handleDeleteMain, handleSaveEdit, navigate, handleImageChange, handleToggleHide }) {
   const { i18n, t } = useTranslation();
   const [editMode, setEditMode] = useState(false);
   const [editNameAr, setEditNameAr] = useState(topic.name_ar || "");
@@ -24,25 +24,25 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
         <div className="p-4 flex flex-col gap-2">
           <input
             className="border rounded px-3 py-2"
-            placeholder="الاسم (العربية)"
+            placeholder={t('germanyPharmacy.nameAr', 'الاسم (العربية)')}
             value={editNameAr}
             onChange={(e) => setEditNameAr(e.target.value)}
           />
           <input
             className="border rounded px-3 py-2"
-            placeholder="Name (English)"
+            placeholder={t('germanyPharmacy.nameEn', 'Name (English)')}
             value={editNameEn}
             onChange={(e) => setEditNameEn(e.target.value)}
           />
           <input
             className="border rounded px-3 py-2"
-            placeholder="Name (Deutsch)"
+            placeholder={t('germanyPharmacy.nameDe', 'Name (Deutsch)')}
             value={editNameDe}
             onChange={(e) => setEditNameDe(e.target.value)}
           />
           <textarea
             className="border rounded px-3 py-2 overflow-hidden"
-            placeholder="الوصف (العربية)"
+            placeholder={t('germanyPharmacy.descriptionAr', 'الوصف (العربية)')}
             value={editDescriptionAr}
             rows={1}
             onChange={(e) => setEditDescriptionAr(e.target.value)}
@@ -53,7 +53,7 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
           />
           <textarea
             className="border rounded px-3 py-2 overflow-hidden"
-            placeholder="Description (English)"
+            placeholder={t('germanyPharmacy.descriptionEn', 'Description (English)')}
             value={editDescriptionEn}
             rows={1}
             onChange={(e) => setEditDescriptionEn(e.target.value)}
@@ -64,7 +64,7 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
           />
           <textarea
             className="border rounded px-3 py-2 overflow-hidden"
-            placeholder="Beschreibung (Deutsch)"
+            placeholder={t('germanyPharmacy.descriptionDe', 'Beschreibung (Deutsch)')}
             value={editDescriptionDe}
             rows={1}
             onChange={(e) => setEditDescriptionDe(e.target.value)}
@@ -117,19 +117,19 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
           )}
           <div className="p-4">
             <h3 className="text-lg font-semibold mb-2">{getLocalizedValue(topic, 'name', i18n.language)}</h3>
-{getLocalizedValue(topic, 'description', i18n.language) ? (
-  <LinkableText
-    className="text-gray-600 text-sm mb-3"
-    text={getLocalizedValue(topic, 'description', i18n.language)}
-  />
-) : (
-  <p className="text-gray-400 text-sm mb-3">لا يوجد وصف متاح</p>
-)}            <div className="flex gap-2">
+            {getLocalizedValue(topic, 'description', i18n.language) ? (
+              <LinkableText
+                className="text-gray-600 text-sm mb-3"
+                text={getLocalizedValue(topic, 'description', i18n.language)}
+              />
+            ) : (
+              <p className="text-gray-400 text-sm mb-3">{t('germanyPharmacy.noDescription', 'لا يوجد وصف متاح')}</p>
+            )}            <div className="flex gap-2">
               <button
                 className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                onClick={() => navigate(`/virtualPharmacy/${topic._id}/lesson`)}
+                onClick={() => navigate(`/main/${topic._id}/germanyPharmacyresearch`)}
               >
-                📂 عرض الدروس  
+                📂 {t('germanyPharmacy.viewResearch', 'عرض الأبحاث')}
               </button>
               <button
                 className="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
@@ -146,9 +146,10 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
             </div>
 
 
+
             {/* 🔹 إضافة Toggle للإخفاء */}
             <div className="mt-4 flex items-center justify-between">
-              <label className="text-sm font-medium text-gray-700">إخفاء من التطبيق الجوال</label>
+              <label className="text-sm font-medium text-gray-700">{t('germanyPharmacy.hideMobile', 'إخفاء من التطبيق الجوال')}</label>
               <input
                 type="checkbox"
                 checked={topic.isHidden || false}
@@ -160,10 +161,9 @@ export default function  TopicCard({ topic, handleDeleteMain, handleSaveEdit, na
             {/* إشارة بصرية لحالة الإخفاء */}
             {topic.isHidden && (
               <div className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                مخفي
+                {t('germanyPharmacy.hidden', 'مخفي')}
               </div>
             )}
-
 
           </div>
         </>

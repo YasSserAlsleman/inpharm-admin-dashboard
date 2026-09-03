@@ -385,6 +385,7 @@ function RichTextInput({ label, value, onChange, placeholder, height = "h-40" })
     toolbar: [
       [{ 'header': [1, 2, false] }],
       ['bold', 'italic', 'underline', 'strike'],
+      ['link'],
       [{ 'color': [] }, { 'background': [] }],
       ['clean']
     ],

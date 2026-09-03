@@ -25,9 +25,19 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
   const [selectedPharmacyTopic, setSelectedPharmacyTopic] = useState(null);
   const [pharmacyLessons, setPharmacyLessons] = useState([]);
 
+  // Germany Pharmacy tab states
+  const [germanyPharmacyMainTopics, setGermanyPharmacyMainTopics] = useState([]);
+  const [selectedGermanyPharmacyTopic, setSelectedGermanyPharmacyTopic] = useState(null);
+  const [germanyPharmacyResearches, setGermanyPharmacyResearches] = useState([]);
+  const [selectedGermanyPharmacyResearch, setSelectedGermanyPharmacyResearch] = useState(null);
+  const [germanyPharmacyLectures, setGermanyPharmacyLectures] = useState([]);
+  const [selectedGermanyPharmacyLecture, setSelectedGermanyPharmacyLecture] = useState(null);
+  const [germanyPharmacyLessons, setGermanyPharmacyLessons] = useState([]);
+
   const [loadingLearning, setLoadingLearning] = useState(false)
   const [loadingPodcast, setLoadingPodcast] = useState(false)
   const [loadingPharmacy, setLoadingPharmacy] = useState(false)
+  const [loadingGermanyPharmacy, setLoadingGermanyPharmacy] = useState(false)
   
 
 
@@ -37,6 +47,7 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
       fetchLearningTopic();
       fetchPodcastMainTopics();
       fetchPharmacyMainTopics();
+      fetchGermanyPharmacyMainTopics();
     }
   }, [isOpen]);
 
@@ -74,6 +85,25 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
       fetchPharmacyLessonsByMainTopic(selectedPharmacyTopic);
     }
   }, [selectedPharmacyTopic]);
+
+  // Load Germany Pharmacy lessons when topic is selected
+  useEffect(() => {
+    if (selectedGermanyPharmacyTopic) {
+      fetchGermanyPharmacyResearches(selectedGermanyPharmacyTopic);
+    }
+  }, [selectedGermanyPharmacyTopic]);
+
+  useEffect(() => {
+    if (selectedGermanyPharmacyResearch) {
+      fetchGermanyPharmacyLectures(selectedGermanyPharmacyResearch);
+    }
+  }, [selectedGermanyPharmacyResearch]);
+
+  useEffect(() => {
+    if (selectedGermanyPharmacyLecture) {
+      fetchGermanyPharmacyLessonsByLecture(selectedGermanyPharmacyLecture);
+    }
+  }, [selectedGermanyPharmacyLecture]);
 
   // 📚 Fetch Learning Main Topic
   const fetchLearningTopic = useCallback(async () => {
@@ -195,6 +225,66 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
     }
   }, []);
 
+  // 🏥 Fetch Germany Pharmacy main topics
+  const fetchGermanyPharmacyMainTopics = useCallback(async () => {
+    try {
+      setLoadingGermanyPharmacy(true);
+      const res = await axios.get("/germanyPharmacyMainTopic");
+      setGermanyPharmacyMainTopics(res.data);
+    } catch (err) {
+      console.error("Error fetching Germany pharmacy main topics:", err);
+    } finally {
+      setLoadingGermanyPharmacy(false);
+    }
+  }, []);
+
+  // 🏥 Fetch Germany Pharmacy researches by main topic
+  const fetchGermanyPharmacyResearches = useCallback(async (mainId) => {
+    try {
+      setLoadingGermanyPharmacy(true);
+      const res = await axios.get(`/germanyPharmacyResearch/byMain/${mainId}`);
+      setGermanyPharmacyResearches(res.data);
+      setSelectedGermanyPharmacyResearch(null);
+      setGermanyPharmacyLectures([]);
+      setSelectedGermanyPharmacyLecture(null);
+      setGermanyPharmacyLessons([]);
+    } catch (err) {
+      console.error("Error fetching Germany pharmacy researches:", err);
+    } finally {
+      setLoadingGermanyPharmacy(false);
+    }
+  }, []);
+
+  // 🏥 Fetch Germany Pharmacy lectures by research
+  const fetchGermanyPharmacyLectures = useCallback(async (researchId) => {
+    try {
+      setLoadingGermanyPharmacy(true);
+      const res = await axios.get(`/lecture/byResearch/${researchId}`);
+      setGermanyPharmacyLectures(res.data);
+      setSelectedGermanyPharmacyLecture(null);
+      setGermanyPharmacyLessons([]);
+    } catch (err) {
+      console.error("Error fetching Germany pharmacy lectures:", err);
+    } finally {
+      setLoadingGermanyPharmacy(false);
+    }
+  }, []);
+
+  // 🏥 Fetch Germany Pharmacy lessons by lecture
+  const fetchGermanyPharmacyLessonsByLecture = useCallback(async (lectureId) => {
+    try {
+      setLoadingGermanyPharmacy(true);
+      const res = await axios.get(
+        `/germanyPharmacyLesson/byLecture/${lectureId}`
+      );
+      setGermanyPharmacyLessons(res.data.filter((l) => l._id !== currentLessonId));
+    } catch (err) {
+      console.error("Error fetching Germany pharmacy lessons:", err);
+    } finally {
+      setLoadingGermanyPharmacy(false);
+    }
+  }, []);
+
   // Add lesson to selected list
   const addLesson = (lessonId, lessonType, lessonName) => {
     // Check if already selected
@@ -289,12 +379,18 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
     setSelectedLecture(null);
     setSelectedPodcastTopic(null);
     setSelectedPharmacyTopic(null);
+    setSelectedGermanyPharmacyTopic(null);
+    setSelectedGermanyPharmacyResearch(null);
+    setSelectedGermanyPharmacyLecture(null);
 
     setResearches([]);
     setLectures([]);
     setLearningLessons([]);
     setPodcastLessons([]);
     setPharmacyLessons([]);
+    setGermanyPharmacyResearches([]);
+    setGermanyPharmacyLectures([]);
+    setGermanyPharmacyLessons([]);
 
     onClose();
   }
@@ -324,6 +420,11 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
                   setActiveTab("learning");
                   setSelectedPodcastTopic(null);
                   setSelectedPharmacyTopic(null);
+                  setSelectedGermanyPharmacyResearch(null);
+                  setSelectedGermanyPharmacyLecture(null);
+                  setGermanyPharmacyResearches([]);
+                  setGermanyPharmacyLectures([]);
+                  setGermanyPharmacyLessons([]);
                   setSelectedResearch(null);
                   setSelectedLecture(null);
                 }}
@@ -339,6 +440,7 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
                   setActiveTab("podcast");
                   setSelectedLearningTopic(null);
                   setSelectedPharmacyTopic(null);
+                  setSelectedGermanyPharmacyTopic(null);
                 }}
                 className={`w-full p-3 rounded text-left font-medium transition ${activeTab === "podcast"
                   ? "bg-blue-600 text-white"
@@ -352,13 +454,38 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
                   setActiveTab("pharmacy");
                   setSelectedLearningTopic(null);
                   setSelectedPodcastTopic(null);
+                  setSelectedGermanyPharmacyTopic(null);
+                  setSelectedGermanyPharmacyResearch(null);
+                  setSelectedGermanyPharmacyLecture(null);
+                  setGermanyPharmacyResearches([]);
+                  setGermanyPharmacyLectures([]);
+                  setGermanyPharmacyLessons([]);
+                  setSelectedGermanyPharmacyResearch(null);
+                  setSelectedGermanyPharmacyLecture(null);
+                  setGermanyPharmacyResearches([]);
+                  setGermanyPharmacyLectures([]);
+                  setGermanyPharmacyLessons([]);
                 }}
                 className={`w-full p-3 rounded text-left font-medium transition ${activeTab === "pharmacy"
                   ? "bg-blue-600 text-white"
                   : "bg-gray-200 text-gray-800 hover:bg-gray-300"
                   }`}
               >
-                💊 دروس الصيدلية
+                💊 دروس الصيدلية الافتراضية
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab("germanyPharmacy");
+                  setSelectedLearningTopic(null);
+                  setSelectedPodcastTopic(null);
+                  setSelectedPharmacyTopic(null);
+                }}
+                className={`w-full p-3 rounded text-left font-medium transition ${activeTab === "germanyPharmacy"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                  }`}
+              >
+                🏥 صيدلة في ألمانيا
               </button>
             </div>
           </div>
@@ -482,6 +609,70 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
                 </select>
               </div>
             )}
+
+            {activeTab === "germanyPharmacy" && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  اختر المحور الرئيسي
+                </label>
+                <select
+                  value={selectedGermanyPharmacyTopic || ""}
+                  onChange={(e) => {
+                    setSelectedGermanyPharmacyTopic(e.target.value);
+                    setSelectedGermanyPharmacyResearch(null);
+                    setSelectedGermanyPharmacyLecture(null);
+                    setGermanyPharmacyLectures([]);
+                    setGermanyPharmacyLessons([]);
+                  }}
+                  className="w-full border border-gray-300 rounded px-3 py-2"
+                >
+                  <option value="">-- اختر المحور --</option>
+                  {germanyPharmacyMainTopics.map((topic) => (
+                    <option key={topic._id} value={topic._id}>
+                      {topic.name_ar || topic.name}
+                    </option>
+                  ))}
+                </select>
+                {selectedGermanyPharmacyTopic && (
+                  <>
+                    <label className="block text-sm font-medium text-gray-700 my-2">
+                      اختر البحث
+                    </label>
+                    <select
+                      value={selectedGermanyPharmacyResearch || ""}
+                      onChange={(e) => setSelectedGermanyPharmacyResearch(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2 mb-2"
+                    >
+                      <option value="">-- اختر البحث --</option>
+                      {germanyPharmacyResearches.map((research) => (
+                        <option key={research._id} value={research._id}>
+                          {research.name_ar || research.name}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
+                {selectedGermanyPharmacyResearch && (
+                  <>
+                    <label className="block text-sm font-medium text-gray-700 my-2">
+                      اختر المحاضرة
+                    </label>
+                    <select
+                      value={selectedGermanyPharmacyLecture || ""}
+                      onChange={(e) => setSelectedGermanyPharmacyLecture(e.target.value)}
+                      className="w-full border border-gray-300 rounded px-3 py-2"
+                    >
+                      <option value="">-- اختر المحاضرة --</option>
+                      {germanyPharmacyLectures.map((lecture) => (
+                        <option key={lecture._id} value={lecture._id}>
+                          {lecture.name_ar || lecture.name}
+                        </option>
+                      ))}
+                    </select>
+                  </>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Right: Lessons selection */}
@@ -490,7 +681,7 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
               اختر الدروس
             </label>
             <div className="border border-gray-300 rounded p-3 max-h-64 overflow-y-auto bg-gray-50">
-              {loadingLearning || loadingPodcast || loadingPharmacy ? (
+              {loadingLearning || loadingPodcast || loadingPharmacy || loadingGermanyPharmacy ? (
                 <p className="text-gray-500">جاري التحميل...</p>
               ) : (
                 <>
@@ -585,6 +776,36 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
                         </span>
                       </label>
                     ))}
+
+                  {activeTab === "germanyPharmacy" &&
+                    selectedGermanyPharmacyTopic &&
+                    germanyPharmacyLessons.map((lesson) => (
+                      <label key={lesson._id} className="flex items-center mb-2 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedLessons.some(
+                            (l) =>
+                              l.lessonId === lesson._id &&
+                              l.lessonType === "germanyPharmacy"
+                          )}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              addLesson(
+                                lesson._id,
+                                "germanyPharmacy",
+                                lesson.name_ar || lesson.name
+                              );
+                            } else {
+                              removeLesson(lesson._id, "germanyPharmacy");
+                            }
+                          }}
+                          className="w-4 h-4"
+                        />
+                        <span className="mr-2 text-sm">
+                          {lesson.name_ar || lesson.name}
+                        </span>
+                      </label>
+                    ))}
                 </>
               )}
             </div>
@@ -607,7 +828,9 @@ export default function RelatedLessonsModal({ isOpen, onClose,relatedLessons, on
                       ? "📚 تعلم"
                       : lesson.lessonType === "podcast"
                         ? "🎙️ بودكاست"
-                        : "💊 صيدلية"}
+                        : lesson.lessonType === "germanyPharmacy"
+                          ? "🏥 صيدلة في ألمانيا"
+                          : "💊 صيدلية"}
                   </p>
                 </div>
                 <button

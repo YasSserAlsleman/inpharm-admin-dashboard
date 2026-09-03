@@ -99,7 +99,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
  
   // متابعة حالة الدرس
   const pollLessonStatus = (lessonId) => {
-    const interval = setInterval(async () => {
+    const checkStatus = async () => {
       try {
         const res = await axios.get(`/VirtualPharmacyLesson/admin/${lessonId}`);
         const data = res.data;
@@ -120,7 +120,10 @@ const handleToggleHide = async (lessonId, isHidden) => {
       } catch (err) {
         console.error("❌ خطأ أثناء متابعة حالة الدرس:", err);
       }
-    }, 2000);
+    };
+
+    checkStatus();
+    const interval = setInterval(checkStatus, 2000);
   };
 
   // ➕ إضافة درس جديد

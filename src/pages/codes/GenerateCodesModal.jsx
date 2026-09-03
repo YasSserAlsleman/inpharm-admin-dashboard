@@ -95,7 +95,6 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
           resourceType: accessType,
           resourceId: id
         })) : [],
-        expiresIn: 365
       };
 
       const res = await axios.post("/codes/generate", payload);
@@ -103,11 +102,7 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
 
       if (download) {
         const plan = plans.find(p => p._id === planId);
-        exportNewCodes(
-          newCodes,
-          plan?.accessType || "plan",
-          plan?.durationDays || "duration"
-        );
+        exportNewCodes(newCodes, plan);
       }
 
       // Reset form
@@ -128,22 +123,44 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
     }
   };
 
-  const exportNewCodes = (codes, accessType, durationDays) => {
+  const exportNewCodes = (codes, plan) => {
+    const headers = ["Code", "Access Type", "Duration", "Created At", "Expires At"];
 
-    const headers = ["Code"];
+    const formatCsvValue = (value) => {
+      const stringValue = value == null ? "" : String(value);
+      return /[",\n]/.test(stringValue)
+        ? `"${stringValue.replace(/"/g, '""')}"`
+        : stringValue;
+    };
+    const formatDate = (value) => {
+      if (!value) return "";
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? "" : date.toISOString().slice(0, 10);
+    };
 
-    const rows = codes.map(c => [c.code]);
+    const rows = codes.map((code) => {
+      const codeData = typeof code === "string" ? { code } : code || {};
 
-    const csvContent =
-      [headers, ...rows]
-        .map(e => e.join(","))
-        .join("\n");
+      return [
+        codeData.code,
+        codeData.accessType || plan?.accessType,
+        durationM(plan?.durationMonths || plan?.durationDays),
+        formatDate(codeData.createdAt),
+        formatDate(codeData.expiresAt)
+      ].map(formatCsvValue);
+    });
+
+    const csvContent = "\uFEFF" + [headers, ...rows]
+      .map((row) => row.join(";"))
+      .join("\r\n");
 
     const blob = new Blob([csvContent], {
       type: "text/csv;charset=utf-8;"
     });
 
-    const safeDuration = durationM(durationDays);
+    const accessType = plan?.accessType || codes[0]?.accessType || "plan";
+    const duration = plan?.durationMonths || plan?.durationDays || "duration";
+    const safeDuration = durationM(duration);
 
     const fileName = `${accessType}_${safeDuration}.csv`;
 
@@ -154,15 +171,19 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
     link.href = url;
     link.download = fileName;
 
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
-  const durationM = (durationDays) => {
-
-    if (durationDays == 30) return "1 Month"
-    else if (durationDays == 90) return "3 Months"
-    else if (durationDays == 180) return "6 Months"
-    else return "1 Year"
+  const durationM = (duration) => {
+    const durationMonths = ({ 30: 1, 90: 3, 180: 6, 365: 12 }[duration] || duration);
+    if (durationMonths === 1) return "1 Month";
+    if (durationMonths === 3) return "3 Months";
+    if (durationMonths === 6) return "6 Months";
+    if (durationMonths === 12) return "1 Year";
+    return `${durationMonths} Months`;
 
 
 
@@ -176,10 +197,14 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
 
           <TextField
             label="Quantity"
-            type="number"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
             value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            inputProps={{ min: 1 }}
+            onChange={(e) => {
+              const numericValue = e.target.value.replace(/\D/g, "");
+              setQuantity(numericValue ? Number(numericValue) : "");
+            }}
             disabled={loading}
           />
 
@@ -197,7 +222,7 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
           >
             {plans.map(plan => (
               <MenuItem key={plan._id} value={plan._id}>
-                {plan.accessType} ({durationM(plan.durationDays)})
+                {plan.accessType} ({durationM(plan.durationMonths || plan.durationDays)})
               </MenuItem>
             ))}
           </TextField>

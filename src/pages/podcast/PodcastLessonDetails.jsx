@@ -413,6 +413,7 @@ export default function PodcastLessonDetails() {
                                             theme="snow"
                                             value={editedLesson.description_ar || ""}
                                             onChange={(val) => setEditedLesson({ ...editedLesson, description_ar: val })}
+                                            modules={{ toolbar: [['bold', 'italic', 'underline'], ['link'], [{ 'color': [] }], ['clean']] }}
                                             className="h-40 mb-12"
                                         />
                                     </div>
@@ -425,6 +426,7 @@ export default function PodcastLessonDetails() {
                                             theme="snow"
                                             value={editedLesson.description_en || ""}
                                             onChange={(val) => setEditedLesson({ ...editedLesson, description_en: val })}
+                                            modules={{ toolbar: [['bold', 'italic', 'underline'], ['link'], [{ 'color': [] }], ['clean']] }}
                                             className="h-40 mb-12"
                                         />
                                     </div>
@@ -437,6 +439,7 @@ export default function PodcastLessonDetails() {
                                             theme="snow"
                                             value={editedLesson.description_de || ""}
                                             onChange={(val) => setEditedLesson({ ...editedLesson, description_de: val })}
+                                            modules={{ toolbar: [['bold', 'italic', 'underline'], ['link'], [{ 'color': [] }], ['clean']] }}
                                             className="h-40 mb-12"
                                         />
                                     </div>

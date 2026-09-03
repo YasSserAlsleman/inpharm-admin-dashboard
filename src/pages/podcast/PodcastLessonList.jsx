@@ -5,8 +5,8 @@ import { getLocalizedValue } from "../../utils/getLocalizedValue";
 import axios from "../../api/axiosClient";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
-import i18n from "../../i18n";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
+import RichTextEditor from "../../components/RichTextEditor";
 
 export default function PodcastLessonList() {
   const { mainId } = useParams();
@@ -217,23 +217,17 @@ const[loading, setLoading] = useState(true);
           onChange={(e) => setNewLesson({ ...newLesson, name_de: e.target.value })}
         />
 
-        <textarea
-          placeholder="وصف الدرس (العربية)"
-          className="border rounded p-2 md:col-span-2"
+        <RichTextEditor
           value={newLesson.description_ar}
-          onChange={(e) => setNewLesson({ ...newLesson, description_ar: e.target.value })}
+          onChange={(value) => setNewLesson({ ...newLesson, description_ar: value })}
         />
-        <textarea
-          placeholder="Lesson description (English)"
-          className="border rounded p-2 md:col-span-2"
+        <RichTextEditor
           value={newLesson.description_en}
-          onChange={(e) => setNewLesson({ ...newLesson, description_en: e.target.value })}
+          onChange={(value) => setNewLesson({ ...newLesson, description_en: value })}
         />
-        <textarea
-          placeholder="Beschreibung der Lektion (Deutsch)"
-          className="border rounded p-2 md:col-span-2"
+        <RichTextEditor
           value={newLesson.description_de}
-          onChange={(e) => setNewLesson({ ...newLesson, description_de: e.target.value })}
+          onChange={(value) => setNewLesson({ ...newLesson, description_de: value })}
         />
 
         <div className="md:col-span-2">
@@ -374,34 +368,29 @@ const[loading, setLoading] = useState(true);
         ) : (
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-100 text-left">
-                <th className="p-2">#</th>
-                <th className="p-2">{t('lessons.lessonName')}</th>
-                <th className="p-2">🎙️ {t('lessons.media', 'الملفات')}</th>
-                <th className="p-2">{t('lessons.description')}</th>
-                <th className="p-2 text-center">{t('lessons.actions')}</th>
-                <th className="p-2 text-center">{t('lessons.hide', 'إخفاء')}</th>
+              <tr className="border-b">
+                <th className="p-2 text-start">{t('lessons.lessonName')}</th>
+                <th className="p-2 text-start">{t('lessons.description')}</th>
+                <th className="p-2 text-center">الملفات</th>
+                <th className="p-2 text-center">الإجراءات</th>
+                <th className="p-2 text-center">مخفي</th>
               </tr>
             </thead>
-            <tbody> 
-              {lessons.map((lesson, index) => (
-                <tr key={lesson._id} className="border-t hover:bg-gray-50">
-                  <td className="p-2">{index + 1}</td>
-                  <td className="p-2 font-semibold text-gray-800">
+            <tbody>
+              {lessons.map((lesson) => (
+                <tr key={lesson._id} className="border-b">
+                  <td className="p-2">
                     {getLocalizedValue(lesson, "name", i18n.language) || lesson.name}
                   </td>
-                  
-                  {/* عمود الملفات الجديد */}
-                  <td className="p-2">
-                    <MediaStatusIndicator lesson={lesson} type="podcast" compact={true} />
-                  </td>
-                  
                   <td className="p-2 text-gray-600">
                     {getLocalizedValue(lesson, "description", i18n.language)
-                      ? getLocalizedValue(lesson, "description", i18n.language).slice(0, 50) + "..."
+                      ? `${getLocalizedValue(lesson, "description", i18n.language).replace(/<[^>]*>/g, "").slice(0, 50)}...`
                       : lesson.description
-                      ? lesson.description.slice(0, 50) + "..."
-                      : "—"}
+                        ? `${lesson.description.replace(/<[^>]*>/g, "").slice(0, 50)}...`
+                        : "—"}
+                  </td>
+                  <td className="p-2 text-center">
+                    <MediaStatusIndicator lesson={lesson} type="podcast" compact={true} />
                   </td>
                   <td className="p-2 text-center">
                     <div className="flex justify-center gap-2 text-sm">
@@ -431,7 +420,7 @@ const[loading, setLoading] = useState(true);
                   <td className="p-2 text-center">
                     <input
                       type="checkbox"
-                      checked={lesson.isHidden}
+                      checked={lesson.isHidden || false}
                       onChange={(e) => handleToggleHide(lesson._id, e.target.checked)}
                     />
                   </td>

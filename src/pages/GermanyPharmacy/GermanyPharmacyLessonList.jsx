@@ -9,7 +9,7 @@ import i18n from "../../i18n";
 import LanguageIndicator from "../../components/LanguageIndicator";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
  
-export default function LearningLessonList() {
+export default function GermanyPharmacyLessonList() {
   const { lectureId } = useParams();
   const navigate = useNavigate();
 
@@ -80,7 +80,7 @@ export default function LearningLessonList() {
       setLoading(true);
       const [lecRes, lesRes] = await Promise.all([
         axios.get(`/lecture/${lectureId}`),
-        axios.get(`/learningLesson/byLecture/${lectureId}`),
+        axios.get(`/germanyPharmacyLesson/byLecture/${lectureId}`),
       ]);
       setLecture(lecRes.data);
       setLessons(lesRes.data);
@@ -94,7 +94,7 @@ export default function LearningLessonList() {
 // 🔒 تحديث حالة الإخفاء لمحور
 const handleToggleHide = async (lessonId, isHidden) => {
   try {
-    await axios.put(`/learningLesson/${lessonId}/hide`, { isHidden });
+    await axios.put(`/germanyPharmacyLesson/${lessonId}/hide`, { isHidden });
     fetchLectureAndLessons();  // إعادة جلب البيانات لتحديث العرض
   } catch (err) {
     console.error("❌ Error toggling hide:", err);
@@ -107,7 +107,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
     const checkStatus = async () => {
       try {
 
-        const res = await axios.get(`/learningLesson/admin/${lessonId}`);
+        const res = await axios.get(`/germanyPharmacyLesson/admin/${lessonId}`);
         const data = res.data;
         setLessonProgress((prev) => ({
           ...prev,
@@ -170,7 +170,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
 
      
 
-      const res = await axios.post('/learningLesson/add', formData, {
+      const res = await axios.post('/germanyPharmacyLesson/add', formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -222,7 +222,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
 
     if (result.isConfirmed) {
       try {
-        await axios.delete(`/learningLesson/${id}`);
+        await axios.delete(`/germanyPharmacyLesson/${id}`);
         fetchLectureAndLessons();
         Swal.fire("تم الحذف!", "تم حذف الدرس بنجاح.", "success");
       } catch (err) {
@@ -464,7 +464,7 @@ const handleToggleHide = async (lessonId, isHidden) => {
                   
                   {/* عمود الملفات الجديد */}
                   <td className="p-2">
-                    <MediaStatusIndicator lesson={lesson} type="learning" compact={true} />
+                    <MediaStatusIndicator lesson={lesson} type="germanyPharmacy" compact={true} />
                   </td>
                   
                   <td className="p-2 text-gray-600">
@@ -494,14 +494,14 @@ const handleToggleHide = async (lessonId, isHidden) => {
                   <td className="p-2 text-center">
                     <div className="flex justify-center gap-2 text-sm">
                       <button
-                        onClick={() => navigate(`/learningLesson/${lesson._id}/details`)}
+                        onClick={() => navigate(`/germanyPharmacyLesson/${lesson._id}/details`)}
                         title="تعديل الدرس"
                         className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded transition"
                       >
                         ✏️ تعديل
                       </button>
                       <Link
-                        to={`/learningLesson/${lesson._id}/questions`}
+                        to={`/germanyPharmacyLesson/${lesson._id}/questions`}
                         title="الاختبار"
                         className="text-orange-500 hover:text-orange-700 text-lg"
                       >

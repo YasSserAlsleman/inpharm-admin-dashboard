@@ -8,7 +8,7 @@ import { useState, useEffect } from "react";
 import axios from "../../api/axiosClient";
 import { MenuItem } from "@mui/material";
 const Plans = () => {
-   const [duration, setDuration] = useState(30);
+  const [duration, setDuration] = useState(1);
   const [price, setPrice] = useState("");
   const [plans, setPlans] = useState([]);
     const [accessType, setAccessType] = useState("app");
@@ -32,8 +32,8 @@ const Plans = () => {
       return;
     }
     try {
-      await axios.post("/plans", { accessType:accessType, durationDays : Number(duration), price: Number(price) });
-      setAccessType("app"); setDuration(30); setPrice("");
+      await axios.post("/plans", { accessType:accessType, durationMonths: Number(duration), price: Number(price) });
+      setAccessType("app"); setDuration(1); setPrice("");
       fetchPlans();
       setSnackbar({open:true,message:'Plan added successfully',severity:'success'});
     } catch (err) {
@@ -53,15 +53,12 @@ const Plans = () => {
       setSnackbar({open:true,message:'Failed to delete plan',severity:'error'});
     }
   };
-  const   durationM =   (durationDays) => {
-
-   if(durationDays==30) return "1 Month" 
-    else if (durationDays==90) return "3 Months" 
-      else if(durationDays==180) return "6 Months" 
-    else  return "1 Year" 
-
-       
- 
+  const durationM = (durationMonths) => {
+    if (durationMonths === 1) return "1 Month";
+    if (durationMonths === 3) return "3 Months";
+    if (durationMonths === 6) return "6 Months";
+    if (durationMonths === 12) return "1 Year";
+    return `${durationMonths} Months`;
   };
 
   return (
@@ -90,10 +87,10 @@ const Plans = () => {
  onChange={(e)=>setDuration(e.target.value)}
 >
 
-<MenuItem value={30}>1 Month</MenuItem>
-<MenuItem value={90}>3 Months</MenuItem>
-<MenuItem value={180}>6 Months</MenuItem>
-<MenuItem value={365}>1 Year</MenuItem>
+<MenuItem value={1}>1 Month</MenuItem>
+<MenuItem value={3}>3 Months</MenuItem>
+<MenuItem value={6}>6 Months</MenuItem>
+<MenuItem value={12}>1 Year</MenuItem>
 
 </TextField>
 
@@ -116,7 +113,7 @@ const Plans = () => {
             {plans.map(plan => (
               <TableRow key={plan._id}>
                 <TableCell>{plan.accessType}</TableCell>
-                <TableCell> {durationM(plan.durationDays)}</TableCell>
+                <TableCell> {durationM(plan.durationMonths || ({30: 1, 90: 3, 180: 6, 365: 12}[plan.durationDays] || plan.durationDays))}</TableCell>
                 <TableCell>${plan.price}</TableCell>
                 <TableCell>
                   <IconButton color="error" onClick={() => deletePlan(plan._id)}>

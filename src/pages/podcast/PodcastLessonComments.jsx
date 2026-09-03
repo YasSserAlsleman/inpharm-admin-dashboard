@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/axiosClient";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import LinkableText from "../../components/LinkableText";
 
 export default function PodcastLessonComments() {
   const { lessonId } = useParams();
+  const [searchParams] = useSearchParams();
+  const targetCommentId = searchParams.get("commentId");
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
 
@@ -13,8 +15,11 @@ export default function PodcastLessonComments() {
   }, [lessonId]);
 
   const fetchComments = async () => {
-    const res = await axios.get(`/comment/byLesson/${lessonId}`);
+    const res = await axios.get(`/comments/${lessonId}`);
     setComments(res.data);
+    if (targetCommentId) {
+      setTimeout(() => document.getElementById(`comment-${targetCommentId}`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 0);
+    }
   };
 
   const addComment = async () => {
@@ -58,13 +63,13 @@ export default function PodcastLessonComments() {
       </div>
 
       {comments.filter(c => !c.isDeleted).map((c) => (
-        <div key={c._id} className="border-t pt-3 mt-3">
+        <div id={`comment-${c._id}`} key={c._id} className={`border-t pt-3 mt-3 ${targetCommentId === c._id ? "bg-red-50 ring-2 ring-red-400 p-3" : ""}`}>
           <p>
             <strong>{c.userName}:</strong> <LinkableText text={c.text} />
           </p>
           <div className="ml-6 mt-2 space-y-1">
             {c.replies.filter(r => !r.isDeleted).map((r, i) => (
-              <p key={i} className="text-gray-600 text-sm">
+              <p id={`comment-${r._id}`} key={r._id || i} className={`text-gray-600 text-sm ${targetCommentId === r._id ? "bg-red-50 ring-2 ring-red-400 p-2" : ""}`}>
                 ↳ <strong>{r.userName}:</strong> <LinkableText text={r.text} />
               </p>
             ))}
