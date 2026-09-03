@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -72,6 +73,9 @@ export default function Login() {
         >
           {loading ? t('login.signing') : t('button.signIn')}
         </button>
+        {/* <Link to="/forgot-password" className="mt-4 block text-center text-sm text-primary">
+          نسيت كلمة المرور؟
+        </Link> */}
       </form>
     </div>
   );

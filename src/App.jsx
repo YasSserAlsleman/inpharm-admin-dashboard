@@ -6,22 +6,13 @@ import PrivateRoute from "./pages/privateRoute";
 
 // Pages
 import Login from "./pages/Login";
-
-      {/* ---------------- Pharmacy in Germany (behaves like Learning) ---------------- */}
-      <Route
-        path="/pharmacy-germany"
-        element={
-          <PrivateRoute roles={['admin','manager']}>
-            <AdminLayout><LearningMainTopic /></AdminLayout>
-          </PrivateRoute>
-        }
-      />
 import NotFound from "./pages/NotFound";
 import Users from "./pages/user/Users";
 import Managers from "./pages/user/Managers";
 import Students from "./pages/user/Students";
 import ChangePassword from "./pages/user/ChangePassword";
 import ResetPassword from "./pages/ResetPassword";
+import ForgotPassword from "./pages/ForgotPassword";
 
 import Codes from "./pages/codes/Codes";
 import Plans from "./pages/codes/Plans";
@@ -72,6 +63,7 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/inpharm" element={<ResetPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
       {/* 🔹 Dashboard / Main page (Admin + Manager) */}
       <Route
