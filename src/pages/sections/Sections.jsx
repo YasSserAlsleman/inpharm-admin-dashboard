@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext'
 export default function Sections() {
   const { can } = useAuth()
   const [sections, setSections] = useState([])
-  const [form, setForm] = useState({ name:'', name_ar:'', name_en:'', name_de:'', order:0, active:true })
+  const [form, setForm] = useState({ name:'', name_ar:'', name_en:'', name_de:'', slug:'learning', order:0, active:true })
   const [file, setFile] = useState(null)
   const [editingId, setEditingId] = useState(null)
 
@@ -53,7 +53,7 @@ export default function Sections() {
 
   const edit = (s)=>{
     setEditingId(s._id)
-    setForm({ name:s.name||'', name_ar:s.name_ar||'', name_en:s.name_en||'', name_de:s.name_de||'', order:s.order||0, active: s.active })
+    setForm({ name:s.name||'', name_ar:s.name_ar||'', name_en:s.name_en||'', name_de:s.name_de||'', slug:s.slug || 'learning', order:s.order||0, active: s.active })
   }
 
   const remove = async (id)=>{
@@ -97,6 +97,12 @@ export default function Sections() {
         <input name="name_ar" value={form.name_ar} onChange={handleChange} placeholder="الاسم بالعربية" className="p-2 border" />
         <input name="name_en" value={form.name_en} onChange={handleChange} placeholder="الاسم بالإنجليزية" className="p-2 border" />
         <input name="name_de" value={form.name_de} onChange={handleChange} placeholder="الاسم بالألمانية" className="p-2 border" />
+        <select name="slug" value={form.slug} onChange={handleChange} className="p-2 border">
+          <option value="learning">learning</option>
+          <option value="virtual-pharmacy">virtual-pharmacy</option>
+          <option value="podcast">podcast</option>
+          <option value="pharmacy-germany">pharmacy-germany</option>
+        </select>
         <input name="order" value={form.order} onChange={handleChange} placeholder="الترتيب" type="number" className="p-2 border" />
     {/* <label className="flex items-center gap-2"><input type="checkbox" name="active" checked={form.active} onChange={handleChange} /> مفعل</label> */}
         <input type="file" onChange={handleFile} disabled={sections.length >= 4 && !editingId} />
@@ -104,7 +110,7 @@ export default function Sections() {
           {((editingId && can('sections.update')) || (!editingId && can('sections.create'))) && (
             <button className="bg-primary text-white px-4 py-2 rounded mr-2" type="submit" disabled={sections.length >= 4 && !editingId}>{editingId ? 'تحديث' : 'إنشاء'}</button>
           )}
-          {editingId && <button type="button" onClick={()=>{ setEditingId(null); setForm({ name:'', name_ar:'', name_en:'', name_de:'', order:0, active:true }) }} className="px-4 py-2">إلغاء</button>}
+          {editingId && <button type="button" onClick={()=>{ setEditingId(null); setForm({ name:'', name_ar:'', name_en:'', name_de:'', slug:'learning', order:0, active:true }) }} className="px-4 py-2">إلغاء</button>}
         </div>
       </form>
 
