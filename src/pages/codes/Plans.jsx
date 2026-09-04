@@ -9,6 +9,15 @@ import axios from "../../api/axiosClient";
 import { MenuItem } from "@mui/material";
 import { useAuth } from "../../contexts/AuthContext";
 const Plans = () => {
+  const getAccessTypeLabel = (accessType) => ({
+    app: 'Application',
+    section: 'Section',
+    topic: 'Main Topic',
+    research: 'Research',
+    lecture: 'Lecture',
+    'pharmacy-germany': 'Pharmacy in Germany',
+    'virtual-pharmacy': 'Virtual Pharmacy',
+  }[accessType] || accessType || 'Unknown');
   const [duration, setDuration] = useState(1);
   const [price, setPrice] = useState("");
   const [plans, setPlans] = useState([]);
@@ -114,7 +123,7 @@ const Plans = () => {
           <TableBody>
             {plans.map(plan => (
               <TableRow key={plan._id}>
-                <TableCell>{plan.accessType}</TableCell>
+                <TableCell>{getAccessTypeLabel(plan.accessType)}</TableCell>
                 <TableCell> {durationM(plan.durationMonths || ({30: 1, 90: 3, 180: 6, 365: 12}[plan.durationDays] || plan.durationDays))}</TableCell>
                 <TableCell>${plan.price}</TableCell>
                 <TableCell>

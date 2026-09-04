@@ -17,6 +17,12 @@ import Alert from "@mui/material/Alert";
 
 const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
 
+  const getTargetLabel = (target) => {
+    if (!target) return "Unknown";
+    if (target.slug === "pharmacy-germany") return "Pharmacy in Germany";
+    return target.name || target.name_en || target.name_de || target.name_ar || target.title || target._id;
+  };
+
   const [quantity, setQuantity] = useState(1);
   const [planId, setPlanId] = useState("");
   const [accessType, setAccessType] = useState("");
@@ -237,7 +243,7 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
                 renderValue={(selected) => (
                   <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                     {selected.map((value) => (
-                      <Chip key={value} label={availableTargets.find(t => t._id === value)?.name || value} />
+                      <Chip key={value} label={getTargetLabel(availableTargets.find(t => t._id === value))} />
                     ))}
                   </Box>
                 )}
@@ -247,7 +253,7 @@ const GenerateCodesModal = ({ open, handleClose, onGenerated }) => {
                 ) : (
                   availableTargets.map(target => (
                     <MenuItem key={target._id} value={target._id}>
-                      {target.name || target.title || target._id}
+                      {getTargetLabel(target)}
                     </MenuItem>
                   ))
                 )}

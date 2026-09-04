@@ -15,6 +15,15 @@ import GenerateCodesModal from '../codes/GenerateCodesModal';
 import { useAuth } from "../../contexts/AuthContext";
 
 const Codes = () => {
+  const getAccessTypeLabel = (accessType) => ({
+    app: 'Application',
+    section: 'Section',
+    topic: 'Main Topic',
+    research: 'Research',
+    lecture: 'Lecture',
+    'pharmacy-germany': 'Pharmacy in Germany',
+    'virtual-pharmacy': 'Virtual Pharmacy',
+  }[accessType] || accessType || 'Unknown');
   const [modalOpen, setModalOpen] = useState(false);
   const [codes, setCodes] = useState([]);
   const [plans, setPlans] = useState([]);
@@ -117,7 +126,7 @@ const exportCodes = () => {
 
   const rows = codes.map((c) => [
     c.code || '',
-    c.planId?.accessType || c.accessType || 'Unknown',
+    getAccessTypeLabel(c.planId?.accessType || c.accessType),
     durationM(c.planId?.durationMonths || c.planId?.durationDays || c.durationDays),
     formatDate(c.createdAt),
     formatDate(c.expiresAt),
@@ -265,7 +274,7 @@ const durationM = (durationDays) => {
             {codes.map(c=>(
               <TableRow key={c._id}>
                 <TableCell>{c.code}</TableCell>
-                <TableCell>{c.planId ? `${c.accessType} (${durationM(c.planId.durationMonths || c.planId.durationDays)})` : 'Unknown'}</TableCell>
+                <TableCell>{c.planId ? `${getAccessTypeLabel(c.planId.accessType || c.accessType)} (${durationM(c.planId.durationMonths || c.planId.durationDays)})` : 'Unknown'}</TableCell>
                 <TableCell>{c.usedBy?.name || '-'}</TableCell>
                 <TableCell>
                   {c.isUsed ? <Chip label="Used" color="success" /> : <Chip label="Unused" sx={{background:'orange',color:'white'}} />}
