@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import { Box, Button, TextField, Alert, Typography } from "@mui/material";
 import axios from "../../api/axiosClient";
 import { useTranslation } from "react-i18next";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function ChangePassword() {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -48,6 +50,38 @@ export default function ChangePassword() {
       <Typography variant="h5" className="font-bold mb-4">
         {t("passwordChange.title")}
       </Typography>
+
+      <Box
+        sx={{
+          mb: 3,
+          p: 2,
+          border: "1px solid",
+          borderColor: "divider",
+          borderRadius: 1,
+          backgroundColor: "action.hover"
+        }}
+      >
+        <Typography variant="h6" sx={{ mb: 1.5 }}>
+          {t("adminInfo.title")}
+        </Typography>
+        <Box className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <Typography>
+            <strong>{t("adminInfo.name")}:</strong> {user?.name || t("common.notAvailable")}
+          </Typography>
+          <Typography>
+            <strong>{t("adminInfo.email")}:</strong> {user?.email || t("common.notAvailable")}
+          </Typography>
+          <Typography>
+            <strong>{t("adminInfo.role")}:</strong>{" "}
+            {t(`adminInfo.roles.${user?.role}`, { defaultValue: user?.role || t("common.notAvailable") })}
+          </Typography>
+          {user?.phone && (
+            <Typography>
+              <strong>{t("adminInfo.phone")}:</strong> {user.phone}
+            </Typography>
+          )}
+        </Box>
+      </Box>
 
       {successMessage && (
         <Alert severity="success" sx={{ mb: 2 }}>

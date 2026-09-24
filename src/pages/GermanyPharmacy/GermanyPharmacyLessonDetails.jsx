@@ -8,8 +8,8 @@ import LinkableText from "../../components/LinkableText";
 import RelatedLessonsModal from "../../components/RelatedLessonsModal";
 import LanguageIndicator from "../../components/LanguageIndicator";
 import Swal from "sweetalert2";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export default function GermanyPharmacyLessonDetails() {
   const { i18n, t } = useTranslation();

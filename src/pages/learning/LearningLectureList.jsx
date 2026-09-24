@@ -4,6 +4,7 @@ import axios from "../../api/axiosClient";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../../utils/getLocalizedValue';
 import { useAuth } from '../../contexts/AuthContext';
+import SortableList from '../../components/SortableList';
 
 export default function LearningLectureList() {
   const { researchId } = useParams();
@@ -233,8 +234,12 @@ const handleToggleHide = async (lectureId, isHidden) => {
             </tr>
           </thead>
           <tbody>
-            {lectures.map((lecture, index) => (
-              <tr key={lecture._id} className="border-t hover:bg-gray-50">
+            <SortableList
+              items={lectures}
+              setItems={setLectures}
+              type="lectures"
+              renderItem={(lecture, index, dragProps) => (
+              <tr key={lecture._id} {...dragProps} className="border-t hover:bg-gray-50">
                 <td className="p-2">{index + 1}</td>
                 <td className="p-2">
                   {editingLectureId === lecture._id ? (
@@ -335,7 +340,8 @@ const handleToggleHide = async (lectureId, isHidden) => {
                   </div>
                 </td>
               </tr>
-            ))}
+              )}
+            />
           </tbody>
         </table>
       )}

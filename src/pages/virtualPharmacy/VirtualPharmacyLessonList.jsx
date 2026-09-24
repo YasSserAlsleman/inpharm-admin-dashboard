@@ -6,6 +6,7 @@ import axios from "../../api/axiosClient";
 import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
+import SortableList from "../../components/SortableList";
 
 export default function VirtualPharmacyLessonList() {
   const { mainId } = useParams();
@@ -456,8 +457,12 @@ formData.append("notifyOnCreate", newLesson.notifyOnCreate);
               </tr>
             </thead>
             <tbody>
-              {lessons.map((lesson, index) => (
-                <tr key={lesson._id} className="border-t hover:bg-gray-50">
+              <SortableList
+                items={lessons}
+                setItems={setLessons}
+                type="virtualLessons"
+                renderItem={(lesson, index, dragProps) => (
+                <tr key={lesson._id} {...dragProps} className="border-t hover:bg-gray-50">
                   <td className="p-2">{index + 1}</td>
                   <td className="p-2 font-semibold text-gray-800">
                     {getLocalizedValue(lesson, "name", i18n.language) || lesson.name}
@@ -527,7 +532,8 @@ formData.append("notifyOnCreate", newLesson.notifyOnCreate);
                     />
                   </td>
                 </tr>
-              ))}
+                )}
+              />
             </tbody>
           </table>
         )}

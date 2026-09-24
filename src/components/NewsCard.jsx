@@ -2,7 +2,6 @@
 import React, { useState } from "react";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../utils/getLocalizedValue';
-import RichTextEditor from './RichTextEditor';
 import LinkableText from './LinkableText';
 
 export default function NewsCard({ item, handleDeleteNews, handleSaveEdit, navigate, handleToggleHide }) {
@@ -37,17 +36,20 @@ export default function NewsCard({ item, handleDeleteNews, handleSaveEdit, navig
             value={editNameDe}
             onChange={(e) => setEditNameDe(e.target.value)}
           />
-          <RichTextEditor
+          <textarea
+            className="border rounded px-3 py-2 min-h-24"
             value={editDescriptionAr}
-            onChange={setEditDescriptionAr}
+            onChange={(e) => setEditDescriptionAr(e.target.value)}
           />
-          <RichTextEditor
+          <textarea
+            className="border rounded px-3 py-2 min-h-24"
             value={editDescriptionEn}
-            onChange={setEditDescriptionEn}
+            onChange={(e) => setEditDescriptionEn(e.target.value)}
           />
-          <RichTextEditor
+          <textarea
+            className="border rounded px-3 py-2 min-h-24"
             value={editDescriptionDe}
-            onChange={setEditDescriptionDe}
+            onChange={(e) => setEditDescriptionDe(e.target.value)}
           />
           <div className="flex gap-2 mt-2">
             <button

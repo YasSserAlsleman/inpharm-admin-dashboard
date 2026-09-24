@@ -4,6 +4,7 @@ import axios from "../../api/axiosClient";
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../../utils/getLocalizedValue';
 import { useAuth } from '../../contexts/AuthContext';
+import SortableList from '../../components/SortableList';
 
 export default function GermanyPharmacyResearchList() {
   const { mainId } = useParams();
@@ -178,9 +179,13 @@ const handleToggleHide = async (researchId, isHidden) => {
             </tr>
           </thead>
           <tbody>
-            {researches.map((r, index) => (
+            <SortableList
+              items={researches}
+              setItems={setResearches}
+              type="germanyResearches"
+              renderItem={(r, index, dragProps) => (
               <React.Fragment key={r._id}>
-              <tr className="border-t hover:bg-gray-50">
+              <tr {...dragProps} className="border-t hover:bg-gray-50">
                 <td className="p-2">{index + 1}</td>
                 <td className="p-2">{getLocalizedValue(r, 'name', i18n.language)}</td>
                 <td className="p-2 text-center">
@@ -276,7 +281,8 @@ const handleToggleHide = async (researchId, isHidden) => {
                 </tr>
               )}
               </React.Fragment>
-            ))}
+              )}
+            />
           </tbody>
         </table>
       )}

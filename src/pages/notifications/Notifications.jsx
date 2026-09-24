@@ -66,25 +66,15 @@ export default function Notifications() {
     }
     
     // Navigate based on type
-    if (n.type === 'admin_report') {
-      if (n.data?.lessonId && n.data?.commentId) {
-        const lessonType = n.data.lessonType;
-        const commentsPath = lessonType === 'virtualPharmacy'
-          ? `/virtualPharmacyLesson/${n.data.lessonId}/comments`
-          : lessonType === 'podcast'
-            ? `/podcastLesson/${n.data.lessonId}/comments`
-            : lessonType === 'germanyPharmacy'
-              ? `/germanyPharmacyLesson/${n.data.lessonId}/comments`
-            : `/learningLesson/${n.data.lessonId}/comments`;
-        navigate(`${commentsPath}?commentId=${encodeURIComponent(n.data.commentId)}`);
-      }
-    } else if (n.type === 'admin_new_comment' || n.type === 'reply') {
+    if (n.type === 'admin_report' || n.type === 'admin_new_comment' || n.type === 'reply') {
       if (n.data?.lessonId) {
         const lessonType = n.data.lessonType;
         if (lessonType === 'virtualPharmacy') {
           navigate(`/virtualPharmacyLesson/${n.data.lessonId}/details`);
         } else if (lessonType === 'podcast') {
           navigate(`/podcastLesson/${n.data.lessonId}/details`);
+        } else if (lessonType === 'germanyPharmacy') {
+          navigate(`/germanyPharmacyLesson/${n.data.lessonId}/details`);
         } else {
           navigate(`/learningLesson/${n.data.lessonId}/details`);
         }

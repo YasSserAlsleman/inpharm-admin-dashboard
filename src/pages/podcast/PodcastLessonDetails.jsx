@@ -8,8 +8,8 @@ import RelatedLessonsModal from "../../components/RelatedLessonsModal";
 import LinkableText from "../../components/LinkableText";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
 import Swal from "sweetalert2";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export default function PodcastLessonDetails() {
     const { t,i18n } = useTranslation();

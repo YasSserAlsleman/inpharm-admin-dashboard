@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 
 
 import NewsCard from "../../components/NewsCard";
-import RichTextEditor from "../../components/RichTextEditor";
 
 export default function News() {
 
@@ -142,23 +141,26 @@ const handleToggleHide = async (newsId, isHidden) => {
                
                 <div>
                   <label className="block text-sm font-medium mb-1">Description (Arabic)</label>
-                  <RichTextEditor
+                  <textarea
+                    className="w-full min-h-24 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                     value={newDescriptionAr}
-                    onChange={setNewDescriptionAr}
+                    onChange={(e) => setNewDescriptionAr(e.target.value)}
                   />
                 </div>
                  <div>
                   <label className="block text-sm font-medium mb-1">Description (English)</label>
-                  <RichTextEditor
+                  <textarea
+                    className="w-full min-h-24 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                     value={newDescriptionEn}
-                    onChange={setNewDescriptionEn}
+                    onChange={(e) => setNewDescriptionEn(e.target.value)}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-1">Description (German)</label>
-                  <RichTextEditor
+                  <textarea
+                    className="w-full min-h-24 border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
                     value={newDescriptionDe}
-                    onChange={setNewDescriptionDe}
+                    onChange={(e) => setNewDescriptionDe(e.target.value)}
                   />
                 </div>
               </div>

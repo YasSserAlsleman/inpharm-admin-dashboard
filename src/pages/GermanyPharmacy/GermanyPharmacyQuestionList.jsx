@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "../../api/axiosClient";
-import { BASE_FILE_URL } from '../../config/config';  // أضف هذا في الأعلى
+import { BASE_FILE_URL } from '../../config/config';
 import { useTranslation } from 'react-i18next';
 import { getLocalizedValue } from '../../utils/getLocalizedValue';
+import SortableList from '../../components/SortableList';
 
 export default function GermanyPharmacyQuestionList() {
   const { lessonId } = useParams();
@@ -12,6 +13,7 @@ export default function GermanyPharmacyQuestionList() {
   const [loading, setLoading] = useState(true);
   const { i18n } = useTranslation();
   const [editingQuestionId, setEditingQuestionId] = useState(null); // لتتبع السؤال المراد تعديله
+  const [expandedQuestionId, setExpandedQuestionId] = useState(null);
 
   // نص السؤال + صورة السؤال
   const [newQuestionText, setNewQuestionText] = useState("");
@@ -446,56 +448,80 @@ export default function GermanyPharmacyQuestionList() {
         <p className="text-gray-500">لا توجد أسئلة حالياً.</p>
       ) : (
         <div className="space-y-4">
-          {questions.map((q, idx) => (
-            <div key={q._id} className="border p-3 rounded bg-gray-50">
-              <h4 className="font-bold">{idx + 1}. {getLocalizedValue(q, 'text', i18n.language)}</h4>
-              {q.image && <img src={`${BASE_FILE_URL}/${q.image}`} alt="question" className="w-40 h-40 object-contain mt-1" />}
-               <ul className="list-disc ms-6 mt-2">
-                {q.options.map((opt, i) => (
-                  <li key={i} className={opt.isCorrect ? "text-green-600 font-bold" : ""}>
-                    {getLocalizedValue(opt, 'text', i18n.language)} {opt.isCorrect && "✅"}
-                    {opt.image && <img src={`${BASE_FILE_URL}/${opt.image}`} alt="option" className="w-20 h-20 object-contain inline-block ml-2" />} 
-                  </li>
-                ))}
-                
-                {getLocalizedValue(q, 'note', i18n.language) && <p className="mt-1 italic text-gray-700">💡 {getLocalizedValue(q, 'note', i18n.language)}</p>}
-              {q.noteImage && <img src={`${BASE_FILE_URL}/${q.noteImage}`} alt="note" className="w-40 h-40 object-contain mt-1" />}
-             
-                {q.sources?.length > 0 && (
-                  <div className="mt-2">
-                    <h4 className="font-semibold">📚 المصادر:</h4>
-                    <ul className="list-disc ms-6 text-blue-600">
-                      {q.sources.map((src, i) => (
-                        <li key={i}>
-                          {src.startsWith("http") ? (
-                            <a href={src} target="_blank" rel="noopener noreferrer">{src}</a>
-                          ) : (
-                            src
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+          <SortableList
+            items={questions}
+            setItems={setQuestions}
+            type="questions"
+            renderItem={(q, idx, dragProps) => {
+              const isOpen = expandedQuestionId === q._id;
+
+              return (
+                <div
+                  key={q._id}
+                  {...dragProps}
+                  onClick={() => setExpandedQuestionId((prev) => (prev === q._id ? null : q._id))}
+                  className="border p-3 rounded bg-gray-50 cursor-pointer active:cursor-grabbing"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <h4 className="font-bold">{idx + 1}. {getLocalizedValue(q, 'text', i18n.language)}</h4>
+                    <span className="text-sm text-gray-500">{isOpen ? 'إخفاء' : 'عرض'}</span>
                   </div>
-                )}
 
-
-              </ul>
-              <div className="flex gap-2 mt-3">
-                <button 
-                  onClick={() => handleEditQuestion(q)} 
-                  className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
-                >
-                  ✏️ تعديل
-                </button>
-                <button 
-                  onClick={() => handleDeleteQuestion(q._id)} 
-                  className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-                >
-                  🗑️ حذف
-                </button>
-              </div>
-            </div>
-          ))}
+                  {isOpen && (
+                    <>
+                      {q.image && <img src={`${BASE_FILE_URL}/${q.image}`} alt="question" className="w-40 h-40 object-contain mt-2" />}
+                      <ul className="list-disc ms-6 mt-2">
+                        {q.options.map((opt, i) => (
+                          <li key={i} className={opt.isCorrect ? "text-green-600 font-bold" : ""}>
+                            {getLocalizedValue(opt, 'text', i18n.language)} {opt.isCorrect && "✅"}
+                            {opt.image && <img src={`${BASE_FILE_URL}/${opt.image}`} alt="option" className="w-20 h-20 object-contain inline-block ml-2" />} 
+                          </li>
+                        ))}
+                        {getLocalizedValue(q, 'note', i18n.language) && <p className="mt-1 italic text-gray-700">💡 {getLocalizedValue(q, 'note', i18n.language)}</p>}
+                        {q.noteImage && <img src={`${BASE_FILE_URL}/${q.noteImage}`} alt="note" className="w-40 h-40 object-contain mt-1" />}
+                        {q.sources?.length > 0 && (
+                          <div className="mt-2">
+                            <h4 className="font-semibold">📚 المصادر:</h4>
+                            <ul className="list-disc ms-6 text-blue-600">
+                              {q.sources.map((src, i) => (
+                                <li key={i}>
+                                  {src.startsWith("http") ? (
+                                    <a href={src} target="_blank" rel="noopener noreferrer">{src}</a>
+                                  ) : (
+                                    src
+                                  )}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </ul>
+                      <div className="flex gap-2 mt-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditQuestion(q);
+                          }}
+                          className="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600"
+                        >
+                          ✏️ تعديل
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteQuestion(q._id);
+                          }}
+                          className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
+                        >
+                          🗑️ حذف
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              );
+            }}
+          />
         </div>
       )}
 

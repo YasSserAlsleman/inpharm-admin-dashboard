@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
 import RichTextEditor from "../../components/RichTextEditor";
+import SortableList from "../../components/SortableList";
 
 export default function PodcastLessonList() {
   const { mainId } = useParams();
@@ -377,8 +378,12 @@ const[loading, setLoading] = useState(true);
               </tr>
             </thead>
             <tbody>
-              {lessons.map((lesson) => (
-                <tr key={lesson._id} className="border-b">
+              <SortableList
+                items={lessons}
+                setItems={setLessons}
+                type="podcastLessons"
+                renderItem={(lesson, _, dragProps) => (
+                <tr key={lesson._id} {...dragProps} className="border-b">
                   <td className="p-2">
                     {getLocalizedValue(lesson, "name", i18n.language) || lesson.name}
                   </td>
@@ -425,7 +430,8 @@ const[loading, setLoading] = useState(true);
                     />
                   </td>
                 </tr>
-              ))}
+                )}
+              />
             </tbody>
           </table>
         )}

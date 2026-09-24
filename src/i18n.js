@@ -27,7 +27,8 @@ const resources = {
       },
       button: {
         logout: 'Logout',
-        signIn: 'Sign In'
+        signIn: 'Sign In',
+        save: 'Save'
       },
       language: {
         label: 'Language',
@@ -42,6 +43,25 @@ const resources = {
         signing: 'Signing...',
         failed: 'Login failed',
         deviceMismatch: 'Login from another device. Only one device login is allowed.'
+      },
+      passwordChange: {
+        title: 'Change Password',
+        currentPassword: 'Current password',
+        newPassword: 'New password',
+        confirmPassword: 'Confirm new password',
+        passwordMismatch: 'New password and confirmation do not match',
+        updatedSuccess: 'Password updated successfully'
+      },
+      adminInfo: {
+        title: 'Admin information',
+        name: 'Name',
+        email: 'Email',
+        role: 'Role',
+        phone: 'Phone',
+        roles: {
+          admin: 'Admin',
+          manager: 'Manager'
+        }
       },
       lessons: {
         availableLanguages: 'Available languages',
@@ -120,7 +140,7 @@ const resources = {
         unknown: 'Unknown'
       },
       germanyPharmacy: {
-        pageTitle: 'Main Topics',
+        pageTitle: 'Main Topics (Pharmacy in Germany)',
         addTopic: 'Add Topic',
         noTopics: 'No main topics yet.',
         nameAr: 'Main topic name (Arabic)',
@@ -143,7 +163,7 @@ const resources = {
   },
   ar: {
     translation: {
-      inpharmAdmin: 'إدارة إنفارم',
+      inpharmAdmin: 'إدارة InPharm',
       navigation: {
         learning: 'التعلم',
         virtualPharmacy: 'الصيدلية الافتراضية', 
@@ -163,7 +183,8 @@ const resources = {
       },
       button: {
         logout: 'تسجيل الخروج',
-        signIn: 'تسجيل الدخول'
+        signIn: 'تسجيل الدخول',
+        save: 'حفظ'
       },
       language: {
         label: 'اللغة',
@@ -178,6 +199,25 @@ const resources = {
         signing: 'جاري الدخول...',
         failed: 'فشل تسجيل الدخول',
         deviceMismatch: 'تم تسجيل الدخول من جهاز آخر. يُسمح بتسجيل الدخول من جهاز واحد فقط.'
+      },
+      passwordChange: {
+        title: 'تغيير كلمة المرور',
+        currentPassword: 'كلمة المرور الحالية',
+        newPassword: 'كلمة المرور الجديدة',
+        confirmPassword: 'تأكيد كلمة المرور الجديدة',
+        passwordMismatch: 'كلمة المرور الجديدة وتأكيدها غير متطابقين',
+        updatedSuccess: 'تم تحديث كلمة المرور بنجاح'
+      },
+      adminInfo: {
+        title: 'معلومات الأدمن',
+        name: 'الاسم',
+        email: 'البريد الإلكتروني',
+        role: 'الصلاحية',
+        phone: 'رقم الهاتف',
+        roles: {
+          admin: 'أدمن',
+          manager: 'مدير'
+        }
       },
       lessons: {
         availableLanguages: 'اللغات المتاحة',
@@ -255,7 +295,7 @@ const resources = {
         unknown: 'غير معروف'
       },
       germanyPharmacy: {
-        pageTitle: 'المحاور الرئيسية',
+        pageTitle: 'المحاور الرئيسية لقسم الصيدلة في ألمانيا',
         addTopic: 'إضافة محور',
         noTopics: 'لا توجد محاور رئيسية بعد.',
         nameAr: 'اسم المحور الرئيسي (العربية)',
@@ -299,7 +339,8 @@ const resources = {
       },
       button: {
         logout: 'Abmelden',
-        signIn: 'Anmelden'
+        signIn: 'Anmelden',
+        save: 'Speichern'
       },
       language: {
         label: 'Sprache',
@@ -314,6 +355,25 @@ const resources = {
         signing: 'Anmeldung...',
         failed: 'Anmeldung fehlgeschlagen',
         deviceMismatch: 'Anmeldung von einem anderen Gerät. Nur eine Geräteanmeldung ist erlaubt.'
+      },
+      passwordChange: {
+        title: 'Passwort ändern',
+        currentPassword: 'Aktuelles Passwort',
+        newPassword: 'Neues Passwort',
+        confirmPassword: 'Neues Passwort bestätigen',
+        passwordMismatch: 'Neues Passwort und Bestätigung stimmen nicht überein',
+        updatedSuccess: 'Passwort erfolgreich aktualisiert'
+      },
+      adminInfo: {
+        title: 'Admin-Informationen',
+        name: 'Name',
+        email: 'E-Mail',
+        role: 'Rolle',
+        phone: 'Telefon',
+        roles: {
+          admin: 'Admin',
+          manager: 'Manager'
+        }
       },
       lessons: {
         availableLanguages: 'Verfügbare Sprachen',
@@ -391,7 +451,7 @@ const resources = {
         unknown: 'Unbekannt'
       },
       germanyPharmacy: {
-        pageTitle: 'Hauptthemen',
+        pageTitle: 'Hauptthemen (Apotheke in Deutschland)',
         addTopic: 'Thema hinzufügen',
         noTopics: 'Noch keine Hauptthemen vorhanden.',
         nameAr: 'Name des Hauptthemas (Arabisch)',

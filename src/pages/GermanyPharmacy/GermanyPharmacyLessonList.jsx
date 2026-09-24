@@ -8,6 +8,7 @@ import "sweetalert2/dist/sweetalert2.min.css";
 import i18n from "../../i18n";
 import LanguageIndicator from "../../components/LanguageIndicator";
 import MediaStatusIndicator from "../../components/MediaStatusIndicator";
+import SortableList from "../../components/SortableList";
  
 export default function GermanyPharmacyLessonList() {
   const { lectureId } = useParams();
@@ -452,8 +453,12 @@ const handleToggleHide = async (lessonId, isHidden) => {
               </tr>
             </thead>
             <tbody>
-              {lessons.map((lesson, index) => (
-                <tr key={lesson._id} className="border-t hover:bg-gray-50">
+              <SortableList
+                items={lessons}
+                setItems={setLessons}
+                type="germanyLessons"
+                renderItem={(lesson, index, dragProps) => (
+                <tr key={lesson._id} {...dragProps} className="border-t hover:bg-gray-50">
                   <td className="p-2">{index + 1}</td>
                   <td className="p-2 font-semibold text-gray-800">{getLocalizedValue(lesson, 'name', i18n.language)}</td>
                   
@@ -524,7 +529,8 @@ const handleToggleHide = async (lessonId, isHidden) => {
                     />
                   </td>
                 </tr>
-              ))}
+                )}
+              />
             </tbody>
           </table>
         )}

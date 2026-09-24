@@ -6,11 +6,11 @@ import LinkableText from './LinkableText';
 import { BASE_FILE_URL } from '../config/config';  // أضف هذا في الأعلى
 
 // 🔹 مكون فرعي لعرض/تعديل محور واحد
-export default function TopicCard({ topic, handleDeleteMain, handleSaveEdit, navigate, handleImageChange, handleToggleHide }) {
+export default function TopicCard({ topic, handleDeleteMain, handleSaveEdit, navigate, handleImageChange, handleToggleHide, ...dragProps }) {
   const { i18n, t } = useTranslation();
   const [editMode, setEditMode] = useState(false);
   const [editNameAr, setEditNameAr] = useState(topic.name_ar || "");
-  const [editNameEn, setEditNameEn] = useState(topic.name_en || "");
+    const [editNameEn, setEditNameEn] = useState(topic.name_en || "");
   const [editNameDe, setEditNameDe] = useState(topic.name_de || "");
   const [editDescriptionAr, setEditDescriptionAr] = useState(topic.description_ar || "");
   const [editDescriptionEn, setEditDescriptionEn] = useState(topic.description_en || "");
@@ -19,7 +19,7 @@ export default function TopicCard({ topic, handleDeleteMain, handleSaveEdit, nav
   const [editPreviewImage, setEditPreviewImage] = useState(topic.imageUrl || null);
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden">
+      <div {...dragProps} className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden cursor-grab active:cursor-grabbing">
       {editMode ? (
         <div className="p-4 flex flex-col gap-2">
           <input

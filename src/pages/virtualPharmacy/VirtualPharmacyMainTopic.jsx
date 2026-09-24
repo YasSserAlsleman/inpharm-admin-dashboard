@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from "react-router-dom";
 import TopicCard from "../../components/VirtualPharmacyTopicCard";
+import SortableList from "../../components/SortableList";
 import axios from "../../api/axiosClient";
 
 export default function VirtualPharmacyMainTopic() {
@@ -225,12 +226,14 @@ const handleToggleHide = async (topicId, isHidden) => {
           <p className="text-gray-500">لا توجد محاور رئيسية بعد.</p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {
-            mainTopics.map((topic) => {
-  
-             return (
+            <SortableList
+              items={mainTopics}
+              setItems={setMainTopics}
+              type="virtualTopics"
+              renderItem={(topic, _, dragProps) => (
    <TopicCard
                 key={topic._id}
+                {...dragProps}
                 topic={topic}
                 handleDeleteMain={handleDeleteMain}
                 handleSaveEdit={handleSaveEdit}
@@ -240,8 +243,8 @@ const handleToggleHide = async (topicId, isHidden) => {
               
               />
   
-             );
-            })}
+              )}
+            />
           </div>
         )}
       </div>

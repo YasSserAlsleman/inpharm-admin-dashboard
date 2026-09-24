@@ -3,6 +3,7 @@ import axios from "../../api/axiosClient";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import TopicCard from "../../components/germanyPharmacyTopicCard";
+import SortableList from "../../components/SortableList";
 
 export default function GermanyPharmacyMainTopic() {
   const { t } = useTranslation();
@@ -127,7 +128,7 @@ const handleToggleHide = async (topicId, isHidden) => {
 
   return (
     <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">{t('germanyPharmacy.pageTitle', 'المحاور الرئيسية')}</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">{t('germanyPharmacy.pageTitle', 'المحاور الرئيسية لقسم الصيدلة في ألمانيا')}</h2>
 
       {/* 🔹 إضافة محور رئيسي */}
       {/* 🔹 إضافة محور رئيسي - تصميم عمودي ومحترف */}
@@ -222,12 +223,14 @@ const handleToggleHide = async (topicId, isHidden) => {
         <p className="text-gray-500">{t('germanyPharmacy.noTopics', 'لا توجد محاور رئيسية بعد.')}</p>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {
-          mainTopics.map((topic) => {
-
-           return (
+          <SortableList
+            items={mainTopics}
+            setItems={setMainTopics}
+            type="germanyTopics"
+            renderItem={(topic, _, dragProps) => (
  <TopicCard
               key={topic._id}
+              {...dragProps}
               topic={topic}
               handleDeleteMain={handleDeleteMain}
               handleSaveEdit={handleSaveEdit}
@@ -237,8 +240,8 @@ const handleToggleHide = async (topicId, isHidden) => {
 
             />
 
-           );
-          })}
+            )}
+          />
         </div>
       )}
     </div>

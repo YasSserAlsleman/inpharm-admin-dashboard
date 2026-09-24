@@ -1,14 +1,20 @@
 import React, { useEffect, useState } from "react";
 import axios from "../../api/axiosClient";
 import { BASE_FILE_URL } from '../../config/config';  // أضف هذا في الأعلى
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 export default function AboutPage() {
   const [about, setAbout] = useState({
     platformIntro: "",
     platformIntro_en: "",
     platformIntro_de: "",
+    platformIntroShort: "",
+    platformIntroShort_en: "",
+    platformIntroShort_de: "",
+    platformIntroLong: "",
+    platformIntroLong_en: "",
+    platformIntroLong_de: "",
     goals: "",
     goals_en: "",
     goals_de: "",
@@ -42,18 +48,29 @@ export default function AboutPage() {
     try {
       const res = await axios.get("/about");
       const data = res.data;
+      data.management = Array.isArray(data.management) ? data.management : [];
+      data.teachingStaff = Array.isArray(data.teachingStaff) ? data.teachingStaff : [];
+      data.faq = Array.isArray(data.faq) ? data.faq : [];
+      data.contact = {
+        facebook: "",
+        youtube: "",
+        whatsapp: "",
+        email: "",
+        telegram: "",
+        ...(data.contact || {}),
+      };
       // Split academicPath into arrays for each language
-      data.management = data.management.map(m => ({
+      data.management = data.management.filter(Boolean).map(m => ({
         ...m,
-        academicPath: m.academicPath ? m.academicPath.split('\n').filter(line => line.trim()) : [],
-        academicPath_en: m.academicPath_en ? m.academicPath_en.split('\n').filter(line => line.trim()) : [],
-        academicPath_de: m.academicPath_de ? m.academicPath_de.split('\n').filter(line => line.trim()) : [],
+        academicPath: typeof m.academicPath === 'string' ? m.academicPath.split('\n').filter(line => line.trim()) : [],
+        academicPath_en: typeof m.academicPath_en === 'string' ? m.academicPath_en.split('\n').filter(line => line.trim()) : [],
+        academicPath_de: typeof m.academicPath_de === 'string' ? m.academicPath_de.split('\n').filter(line => line.trim()) : [],
       }));
-      data.teachingStaff = data.teachingStaff.map(t => ({
+      data.teachingStaff = data.teachingStaff.filter(Boolean).map(t => ({
         ...t,
-        academicPath: t.academicPath ? t.academicPath.split('\n').filter(line => line.trim()) : [],
-        academicPath_en: t.academicPath_en ? t.academicPath_en.split('\n').filter(line => line.trim()) : [],
-        academicPath_de: t.academicPath_de ? t.academicPath_de.split('\n').filter(line => line.trim()) : [],
+        academicPath: typeof t.academicPath === 'string' ? t.academicPath.split('\n').filter(line => line.trim()) : [],
+        academicPath_en: typeof t.academicPath_en === 'string' ? t.academicPath_en.split('\n').filter(line => line.trim()) : [],
+        academicPath_de: typeof t.academicPath_de === 'string' ? t.academicPath_de.split('\n').filter(line => line.trim()) : [],
       }));
       setAbout(data);
     } catch (err) {
@@ -89,12 +106,22 @@ export default function AboutPage() {
       const formData = new FormData();
       formData.append("data", JSON.stringify(dataToSave));
 
-      about.management.forEach((m) => {
-        if (m.file) formData.append("managementImages", m.file);
+      const managementImageIndexes = [];
+      about.management.forEach((m, index) => {
+        if (m.file) {
+          formData.append("managementImages", m.file);
+          managementImageIndexes.push(index);
+        }
       });
-      about.teachingStaff.forEach((t) => {
-        if (t.file) formData.append("teachingImages", t.file);
+      const teachingImageIndexes = [];
+      about.teachingStaff.forEach((t, index) => {
+        if (t.file) {
+          formData.append("teachingImages", t.file);
+          teachingImageIndexes.push(index);
+        }
       });
+      formData.append("managementImageIndexes", JSON.stringify(managementImageIndexes));
+      formData.append("teachingImageIndexes", JSON.stringify(teachingImageIndexes));
 
       await axios.post("/about", formData, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -114,6 +141,11 @@ export default function AboutPage() {
       <h2 className="text-3xl font-bold mb-4 text-center text-primary">من نحن</h2>
 
       <SectionInput
+        label="ملخص قصير عن المنصة (العربية)"
+        value={about.platformIntroShort}
+        onChange={(v) => setAbout({ ...about, platformIntroShort: v })}
+      />
+      <SectionInput
         label="تعريف المنصة (العربية)"
         value={about.platformIntro}
         onChange={(v) => setAbout({ ...about, platformIntro: v })}
@@ -127,6 +159,33 @@ export default function AboutPage() {
         label="Über die Plattform (Deutsch)"
         value={about.platformIntro_de}
         onChange={(v) => setAbout({ ...about, platformIntro_de: v })}
+      />
+
+      <SectionInput
+        label="Short platform summary (English)"
+        value={about.platformIntroShort_en}
+        onChange={(v) => setAbout({ ...about, platformIntroShort_en: v })}
+      />
+      <SectionInput
+        label="Kurze Plattformzusammenfassung (Deutsch)"
+        value={about.platformIntroShort_de}
+        onChange={(v) => setAbout({ ...about, platformIntroShort_de: v })}
+      />
+
+      <SectionInput
+        label="مقدمة موسعة عن المنصة (العربية)"
+        value={about.platformIntroLong}
+        onChange={(v) => setAbout({ ...about, platformIntroLong: v })}
+      />
+      <SectionInput
+        label="Expanded platform introduction (English)"
+        value={about.platformIntroLong_en}
+        onChange={(v) => setAbout({ ...about, platformIntroLong_en: v })}
+      />
+      <SectionInput
+        label="Erweiterte Plattformvorstellung (Deutsch)"
+        value={about.platformIntroLong_de}
+        onChange={(v) => setAbout({ ...about, platformIntroLong_de: v })}
       />
 
       <SectionInput
@@ -397,7 +456,7 @@ function RichTextInput({ label, value, onChange, placeholder, height = "h-40" })
       <div className="bg-white">
         <ReactQuill
           theme="snow"
-          value={value || ""}
+          value={typeof value === "string" ? value : ""}
           onChange={onChange}
           modules={modules}
           placeholder={placeholder}
