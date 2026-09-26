@@ -53,7 +53,7 @@ export default function PodcastQuestionList() {
     try {
       setLoading(true);
       const [lessonRes, questionRes] = await Promise.all([
-        axios.get(`/podcastLesson/${lessonId}`),
+        axios.get(`/podcastLesson/admin/${lessonId}`),
         axios.get(`/question/byLesson/${lessonId}`)
       ]);
       setLesson(lessonRes.data);

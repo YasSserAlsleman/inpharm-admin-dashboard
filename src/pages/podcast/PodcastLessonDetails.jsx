@@ -53,7 +53,7 @@ export default function PodcastLessonDetails() {
 
     const fetchLesson = async () => {
         try {
-            const res = await axios.get(`/podcastLesson/${lessonId}`);
+            const res = await axios.get(`/podcastLesson/admin/${lessonId}`);
             setLesson(res.data);
             setRelatedLessons(res.data.relatedLessons || []);
             setEditedLesson({

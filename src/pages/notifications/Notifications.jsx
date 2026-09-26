@@ -43,9 +43,12 @@ export default function Notifications() {
 
   const getIcon = (type) => {
     switch (type) {
-      case 'admin_new_comment': return <CommentIcon className="text-green-500" />;
-      case 'admin_report': return <ReportIcon className="text-red-500" />;
-      case 'news': return <NewsIcon className="text-blue-500" />;
+      case 'admin_new_comment':
+      case 'admin_report':
+      case 'news':
+      case 'new_lesson':
+      case 'new_news':
+      case 'daily_summary': return null;
       default: return <NotificationsIcon className="text-gray-500" />;
     }
   };
@@ -114,9 +117,7 @@ export default function Notifications() {
               onClick={() => handleNotificationClick(n)}
               className={`p-4 border-b last:border-0 flex gap-4 items-start hover:bg-gray-50 cursor-pointer transition ${!n.isRead ? 'bg-blue-50/50' : ''}`}
             >
-              <div className="mt-1">
-                {getIcon(n.type)}
-              </div>
+              {getIcon(n.type) && <div className="mt-1">{getIcon(n.type)}</div>}
               <div className="flex-1">
                 <div className="flex justify-between items-start">
                   <h3 className={`font-semibold ${!n.isRead ? 'text-blue-900' : 'text-gray-700'}`}>
